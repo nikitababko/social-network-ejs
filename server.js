@@ -1118,6 +1118,36 @@ http.listen(3000, function () {
             result.render("inbox");
         });
 
+        app.post("/getFriendsChat", function (request, result) {
+            var accessToken = request.fields.accessToken;
+            var _id = request.fields._id;
+
+            database.collection("users").findOne(
+                {
+                    accessToken: accessToken,
+                },
+                function (error, user) {
+                    if (user == null) {
+                        result.json({
+                            status: "error",
+                            message: "User has been logged out. Please login again.",
+                        });
+                    } else {
+                        var index = user.friends.findIndex(function (friend) {
+                            return friend._id == _id;
+                        });
+                        var inbox = user.friends[index].inbox;
+
+                        result.json({
+                            status: "success",
+                            message: "Record has been fetched",
+                            data: inbox,
+                        });
+                    }
+                }
+            );
+        });
+
         app.get("/pages", function (request, result) {
             result.render("pages");
         });
@@ -1197,11 +1227,120 @@ http.listen(3000, function () {
         });
 
         app.post("/sendMessage", function (request, result) {
-            //
+            var accessToken = request.fields.accessToken;
+            var _id = request.fields._id;
+            var message = request.fields.message;
+
+            database.collection("users").findOne(
+                {
+                    accessToken: accessToken,
+                },
+                function (error, user) {
+                    if (user == null) {
+                        result.json({
+                            status: "error",
+                            message: "User has been logged out. Please login again.",
+                        });
+                    } else {
+                        var me = user;
+                        database.collection("users").findOne(
+                            {
+                                _id: ObjectId(_id),
+                            },
+                            function (error, user) {
+                                if (user == null) {
+                                    result.json({
+                                        status: "error",
+                                        message: "User does not exist",
+                                    });
+                                } else {
+                                    database.collection("users").updateOne(
+                                        {
+                                            $and: [
+                                                {
+                                                    _id: ObjectId(_id),
+                                                },
+                                                {
+                                                    "friends._id": me._id,
+                                                },
+                                            ],
+                                        },
+                                        {
+                                            $push: {
+                                                "friends.$.inbox": {
+                                                    _id: ObjectId(),
+                                                    message: message,
+                                                    from: me._id,
+                                                },
+                                            },
+                                        },
+                                        function (error, data) {
+                                            database.collection("users").updateOne(
+                                                {
+                                                    $and: [
+                                                        {
+                                                            _id: me._id,
+                                                        },
+                                                        {
+                                                            "friends._id": user._id,
+                                                        },
+                                                    ],
+                                                },
+                                                {
+                                                    $push: {
+                                                        "friends.$.inbox": {
+                                                            _id: ObjectId(),
+                                                            message: message,
+                                                            from: me._id,
+                                                        },
+                                                    },
+                                                },
+                                                function (error, data) {
+                                                    socketIO
+                                                        .to(users[user._id])
+                                                        .emit("messageReceived", {
+                                                            message: message,
+                                                            from: me._id,
+                                                        });
+
+                                                    result.json({
+                                                        status: "success",
+                                                        message:
+                                                            "Message has been sent",
+                                                    });
+                                                }
+                                            );
+                                        }
+                                    );
+                                }
+                            }
+                        );
+                    }
+                }
+            );
         });
 
         app.post("/connectSocket", function (request, result) {
-            //
+            var accessToken = request.fields.accessToken;
+            database.collection("users").findOne(
+                {
+                    accessToken: accessToken,
+                },
+                function (error, user) {
+                    if (user == null) {
+                        result.json({
+                            status: "error",
+                            message: "User has been logged out. Please login again.",
+                        });
+                    } else {
+                        users[user._id] = socketID;
+                        result.json({
+                            status: "status",
+                            message: "Socket has been connected",
+                        });
+                    }
+                }
+            );
         });
 
         app.post("/toggleJoinGroup", function (request, result) {
@@ -1439,7 +1578,7 @@ http.listen(3000, function () {
                                                     result.json({
                                                         status: "success",
                                                         message:
-                                                            "Friend request has been accepted",
+                                                            "Friend request has been removed",
                                                     });
                                                 }
                                             );
