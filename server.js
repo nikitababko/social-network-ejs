@@ -467,32 +467,33 @@ http.listen(3000, function () {
                             );
                         }
 
-                        database.collection("posts").insertOne(
-                            {
-                                caption: caption,
-                                image: image,
-                                video: video,
-                                type: type,
-                                createdAt: createdAt,
-                                likers: [],
-                                comments: [],
-                                shares: [],
-                                user: {
-                                    _id: user._id,
-                                    name: user.name,
-                                    username: user.username,
-                                    profileImage: user.profileImage,
+                        if (type == "page_post") {
+                            database.collection("pages").findOne(
+                                {
+                                    _id: ObjectId(_id),
                                 },
-                            },
-                            function (error, data) {
-                                database.collection("users").updateOne(
-                                    {
-                                        accessToken: accessToken,
-                                    },
-                                    {
-                                        $push: {
-                                            posts: {
-                                                _id: data.insertedId,
+                                function (error, page) {
+                                    if (page == null) {
+                                        result.json({
+                                            status: "error",
+                                            message: "Page does not exist.",
+                                        });
+                                        return;
+                                    } else {
+                                        if (
+                                            page.user._id.toString() !==
+                                            user._id.toString()
+                                        ) {
+                                            result.json({
+                                                status: "error",
+                                                message:
+                                                    "Sorry, you do not own this page",
+                                            });
+                                            return;
+                                        }
+
+                                        database.collection("posts").insertOne(
+                                            {
                                                 caption: caption,
                                                 image: image,
                                                 video: video,
@@ -501,18 +502,71 @@ http.listen(3000, function () {
                                                 likers: [],
                                                 comments: [],
                                                 shares: [],
+                                                user: {
+                                                    _id: page._id,
+                                                    name: page.name,
+                                                    profileImage: page.coverPhoto,
+                                                },
+                                            },
+                                            function (error, data) {
+                                                result.json({
+                                                    status: "success",
+                                                    message:
+                                                        "Post has been uploaded.",
+                                                });
+                                            }
+                                        );
+                                    }
+                                }
+                            );
+                        } else {
+                            database.collection("posts").insertOne(
+                                {
+                                    caption: caption,
+                                    image: image,
+                                    video: video,
+                                    type: type,
+                                    createdAt: createdAt,
+                                    likers: [],
+                                    comments: [],
+                                    shares: [],
+                                    user: {
+                                        _id: user._id,
+                                        name: user.name,
+                                        username: user.username,
+                                        profileImage: user.profileImage,
+                                    },
+                                },
+                                function (error, data) {
+                                    database.collection("users").updateOne(
+                                        {
+                                            accessToken: accessToken,
+                                        },
+                                        {
+                                            $push: {
+                                                posts: {
+                                                    _id: data.insertedId,
+                                                    caption: caption,
+                                                    image: image,
+                                                    video: video,
+                                                    type: type,
+                                                    createdAt: createdAt,
+                                                    likers: [],
+                                                    comments: [],
+                                                    shares: [],
+                                                },
                                             },
                                         },
-                                    },
-                                    function (error, data) {
-                                        result.json({
-                                            status: "success",
-                                            message: "Post has been uploaded.",
-                                        });
-                                    }
-                                );
-                            }
-                        );
+                                        function (error, data) {
+                                            result.json({
+                                                status: "success",
+                                                message: "Post has been uploaded.",
+                                            });
+                                        }
+                                    );
+                                }
+                            );
+                        }
                     }
                 }
             );
@@ -1148,10 +1202,6 @@ http.listen(3000, function () {
             );
         });
 
-        app.get("/pages", function (request, result) {
-            result.render("pages");
-        });
-
         app.get("/groups", function (request, result) {
             result.render("groups");
         });
@@ -1338,6 +1388,180 @@ http.listen(3000, function () {
                             status: "status",
                             message: "Socket has been connected",
                         });
+                    }
+                }
+            );
+        });
+
+        // Create page
+        app.get("/createPage", function (request, result) {
+            result.render("createPage");
+        });
+
+        app.post("/createPage", function (request, result) {
+            var accessToken = request.fields.accessToken;
+            var name = request.fields.name;
+            var domainName = request.fields.domainName;
+            var additionalInfo = request.fields.additionalInfo;
+            var coverPhoto = "";
+
+            database.collection("users").findOne(
+                {
+                    accessToken: accessToken,
+                },
+                function (error, user) {
+                    if (user == null) {
+                        result.json({
+                            status: "error",
+                            message: "User has been logged out. Please login again.",
+                        });
+                    } else {
+                        if (
+                            request.files.coverPhoto.size > 0 &&
+                            request.files.coverPhoto.type.includes("image")
+                        ) {
+                            coverPhoto =
+                                "public/images/" +
+                                // new Date().getTime() +
+                                // "-" +
+                                request.files.coverPhoto.name;
+                            fileSystem.rename(
+                                request.files.coverPhoto.path,
+                                coverPhoto,
+                                function (error) {
+                                    //
+                                }
+                            );
+
+                            database.collection("pages").insertOne(
+                                {
+                                    name: name,
+                                    domainName: domainName,
+                                    additionalInfo: additionalInfo,
+                                    coverPhoto: coverPhoto,
+                                    likers: [],
+                                    user: {
+                                        _id: user._id,
+                                        name: user.name,
+                                        profileImage: user.profileImage,
+                                    },
+                                },
+                                function (error, data) {
+                                    result.json({
+                                        status: "success",
+                                        message: "Page has been created",
+                                    });
+                                }
+                            );
+                        } else {
+                            result.json({
+                                status: "error",
+                                message: "Please select a cover photo",
+                            });
+                        }
+                    }
+                }
+            );
+        });
+
+        app.get("/pages", function (request, result) {
+            result.render("pages");
+        });
+
+        app.post("/getPages", function (request, result) {
+            var accessToken = request.fields.accessToken;
+
+            database.collection("users").findOne(
+                {
+                    accessToken: accessToken,
+                },
+                function (error, user) {
+                    if (user == null) {
+                        result.json({
+                            status: "error",
+                            message: "User has been logged out. Please login again.",
+                        });
+                    } else {
+                        database
+                            .collection("pages")
+                            .find({
+                                $or: [
+                                    {
+                                        "user._id": user._id,
+                                    },
+                                    {
+                                        "likers._id": user._id,
+                                    },
+                                ],
+                            })
+                            .toArray(function (error, data) {
+                                result.json({
+                                    status: "success",
+                                    message: "Record has been fetched",
+                                    data: data,
+                                });
+                            });
+                    }
+                }
+            );
+        });
+
+        app.get("/page/:_id", function (request, result) {
+            var _id = request.params._id;
+
+            database.collection("pages").findOne(
+                {
+                    _id: ObjectId(_id),
+                },
+                function (error, user) {
+                    if (user == null) {
+                        result.json({
+                            status: "error",
+                            message: "User has been logged out. Please login again.",
+                        });
+                    } else {
+                        result.render("singlePage", {
+                            _id: _id,
+                        });
+                    }
+                }
+            );
+        });
+
+        app.post("/getPageDetail", function (request, result) {
+            var _id = request.fields._id;
+
+            database.collection("pages").findOne(
+                {
+                    _id: ObjectId(_id),
+                },
+                function (error, page) {
+                    if (page == null) {
+                        result.json({
+                            status: "error",
+                            message: "Page does not exist",
+                        });
+                    } else {
+                        database
+                            .collection("posts")
+                            .find({
+                                $and: [
+                                    {
+                                        "user._id": page._id,
+                                    },
+                                    {
+                                        type: "page_post",
+                                    },
+                                ],
+                            })
+                            .toArray(function (error, posts) {
+                                result.json({
+                                    status: "success",
+                                    message: "Record has been fetched",
+                                    data: page,
+                                    posts: posts,
+                                });
+                            });
                     }
                 }
             );

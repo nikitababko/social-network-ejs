@@ -1,6 +1,6 @@
 <%- include ("includes/header") %>
 
-<section class="premium-section">
+<section>
     <div class="gap gray-bg">
         <div class="container-fluid">
             <div class="row">
@@ -27,5 +27,64 @@
         </div>
     </div>
 </section>
+
+<script>
+    var isPages = true;
+
+    function getPages() {
+        var ajax = new XMLHttpRequest();
+        ajax.open("POST", "/getPages", true);
+
+        ajax.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                var response = JSON.parse(this.responseText);
+
+                if (response.status == "error") {
+                    alert(response.message);
+                    return;
+                }
+
+                var html = "";
+
+                for (var a = 0; a < response.data.length; a++) {
+                    var data = response.data[a];
+
+                    html += "<li>";
+                    html += '<div class="f-page">';
+                    html += "<figure>";
+                    html += '<a href="/page/' + data._id + '">';
+                    html +=
+                        '<img src="' +
+                        mainURL +
+                        "/" +
+                        data.coverPhoto +
+                        '" style="width: 205px; height: 183px; object-fit: cover;">';
+                    html += "</a>";
+
+                    html += "<em>" + data.likers.length + " likes</em>";
+                    html += "</figure>";
+
+                    html += '<div class="page-infos">';
+                    html +=
+                        '<h5><a href="/page/' +
+                        data._id +
+                        '">' +
+                        data.name +
+                        "</a></h5>";
+                    html += "<span>" + data.additionalInfo + "</span>";
+                    html += "</div>";
+                    html += "</div>";
+                    html += "</li>";
+                }
+
+                document.getElementById("all-pages").innerHTML = html;
+            }
+        };
+
+        var formData = new FormData();
+        formData.append("accessToken", localStorage.getItem("accessToken"));
+        ajax.send(formData);
+    }
+</script>
 
 <%- include ("includes/footer") %>

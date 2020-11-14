@@ -71,6 +71,14 @@
 							showFriends()
 						}
 
+						if(typeof isPages !== "undefined" && isPages) {
+							getPages()
+						}
+
+						if(typeof isPageDetail !== "undefined" && isPageDetail) {
+							getPageDetail()
+						}
+
 						if (typeof isPostDetail !== "undefined" && isPostDetail) {
 							showPostDetails();
 						}
