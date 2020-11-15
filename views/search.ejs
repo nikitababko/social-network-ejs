@@ -130,6 +130,52 @@
                     }
 
                     document.getElementById("search-results").innerHTML = html;
+
+                    var html = "";
+                    for (var a = 0; a < response.pages.length; a++) {
+                        var data = response.pages[a];
+
+                        var isLiked = false;
+                        for (var b = 0; b < window.user.pages.length; b++) {
+                            var tempData = window.user.pages[b];
+                            if (tempData._id.toString() == data._id.toString()) {
+                                isLiked = true;
+                                break;
+                            }
+                        }
+
+                        html += "<li>";
+                        html += '<div class="nearly-pepls">';
+                        html += "<figure>";
+                        html += '<a href="/">';
+                        html +=
+                            '<img src="' + mainURL + "/" + data.coverPhoto + '">';
+                        html += "</a>";
+                        html += "</figure>";
+
+                        html += '<div class="pepl-info">';
+                        html += "<h4>";
+                        html += '<a href="/">' + data.name + "</a>";
+                        html += "</h4>";
+
+                        if (isLiked) {
+                            html +=
+                                '<a href="javascript:void(0);" data-id="' +
+                                data._id +
+                                '" onclick="toggleLikePage(this);" class="add-butn btn-unfriend">Unlike</a>';
+                        } else {
+                            html +=
+                                '<a href="javascript:void(0);" data-id="' +
+                                data._id +
+                                '" onclick="toggleLikePage(this);" class="add-butn">Like</a>';
+                        }
+
+                        html += "</div>";
+                        html += "</div>";
+                        html += "</li>";
+                    }
+
+                    document.getElementById("search-result-pages").innerHTML = html;
                 } else {
                     alert(response.message);
                 }
@@ -138,6 +184,36 @@
 
         var formData = new FormData();
         formData.append("query", document.getElementById("query").value);
+        ajax.send(formData);
+    }
+
+    function toggleLikePage(self) {
+        var ajax = new XMLHttpRequest();
+        ajax.open("POST", "/toggleLikePage", true);
+
+        ajax.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                var response = JSON.parse(this.responseText);
+
+                if (response.status == "success") {
+                    self.className = "add-butn btn-unfriend";
+                    self.innerHTML = "Unlike";
+                }
+
+                if (response.status == "unliked") {
+                    self.className = "add-butn";
+                    self.innerHTML = "Like";
+                }
+
+                if (response.status == "error") {
+                    alert(response.message);
+                }
+            }
+        };
+
+        var formData = new FormData();
+        formData.append("accessToken", localStorage.getItem("accessToken"));
+        formData.append("_id", self.getAttribute("data-id"));
         ajax.send(formData);
     }
 

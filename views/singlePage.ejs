@@ -91,6 +91,70 @@
                 ) {
                     showAddPost();
                 }
+
+                var html = "";
+                response.posts = response.posts.reverse();
+                for (var a = 0; a < response.posts.length; a++) {
+                    var data = response.posts[a];
+
+                    html += '<div class="central-meta item">';
+                    html += '<div class="user-post">';
+                    html += '<div class="friend-info">';
+
+                    html += "<figure>";
+                    html +=
+                        '<img src="' + mainURL + "/" + data.user.profileImage + '">';
+                    html += "</figure>";
+
+                    html += '<div class="friend-name">';
+                    html += "<ins>";
+                    html += data.user.name;
+                    html += "</ins>";
+
+                    var createdAt = new Date(data.createdAt);
+                    var date = createdAt.getDate() + "";
+                    date =
+                        date.padStart(2, "0") +
+                        " " +
+                        months[createdAt.getMonth()] +
+                        ", " +
+                        createdAt.getFullYear();
+
+                    html += "<span>Published: " + date + "</span>";
+                    html += "</div>";
+
+                    html += '<div class="post-meta">';
+
+                    html += '<div class="description">';
+                    html += "<p>";
+                    html += data.caption;
+                    html += "</p>";
+                    html += "</div>";
+
+                    if (data.image != "") {
+                        html += '<img src="' + mainURL + "/" + data.image + '">';
+                    }
+
+                    if (data.video != "") {
+                        html +=
+                            '<video style="height: 359px; width: 100%;" controls src="' +
+                            mainURL +
+                            "/" +
+                            data.video +
+                            '"></video>';
+                    }
+
+                    html += createLikesSection(data);
+
+                    html += "</div>";
+                    html += "</div>";
+
+                    html += createCommentsSection(data);
+
+                    html += "</div>";
+                    html += "</div>";
+                }
+                document.getElementById("newsfeed").innerHTML = html;
             }
         };
 
