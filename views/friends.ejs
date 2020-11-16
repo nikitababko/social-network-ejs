@@ -88,7 +88,7 @@
             if (this.readyState == 4 && this.status == 200) {
                 var response = JSON.parse(this.responseText);
 
-                alert(response.message);
+                console.log(response.message);
 
                 self.remove();
             }
@@ -111,7 +111,7 @@
             if (this.readyState == 4 && this.status == 200) {
                 var response = JSON.parse(this.responseText);
 
-                alert(response.message);
+                console.log(response.message);
 
                 self.remove();
             }

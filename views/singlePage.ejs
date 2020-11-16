@@ -8,7 +8,7 @@
             <span id="page-likes"></span>
 
             <a
-                href="javascript:void(0)"
+                href="javascript:void(0);"
                 onclick="toggleLikePage();"
                 id="btn-toggle-like"
             ></a>
@@ -171,7 +171,7 @@
         ajax.onreadystatechange = function () {
             if (this.readyState == 4 && this.status == 200) {
                 var response = JSON.parse(this.responseText);
-                alert(response.message);
+                console.log(response.message);
 
                 if (response.status == "success") {
                     document

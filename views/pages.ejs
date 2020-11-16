@@ -40,7 +40,7 @@
                 var response = JSON.parse(this.responseText);
 
                 if (response.status == "error") {
-                    alert(response.message);
+                    console.log(response.message);
                     return;
                 }
 

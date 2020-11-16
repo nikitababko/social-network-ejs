@@ -100,7 +100,7 @@
                 form.submit.removeAttribute("disabled");
 
                 var response = JSON.parse(this.responseText);
-                alert(response.message);
+                console.log(response.message);
 
                 if (response.status == "success") {
                     form.name.value = "";
