@@ -13,6 +13,7 @@ var bcrypt = require("bcrypt");
 var fileSystem = require("fs");
 
 var jwt = require("jsonwebtoken");
+const e = require("express");
 var accessTokenSecret = "myAccessTokenSecret1234567890";
 
 app.use("/public", express.static(__dirname + "/public"));
@@ -519,6 +520,77 @@ http.listen(3000, function () {
                                     }
                                 }
                             );
+                        } else if (type == "group_post") {
+                            database.collection("groups").findOne(
+                                {
+                                    _id: ObjectId(_id),
+                                },
+                                function (error, group) {
+                                    if (group == null) {
+                                        result.json({
+                                            status: "error",
+                                            message: "Group does not exist.",
+                                        });
+                                        return;
+                                    } else {
+                                        var isMember = false;
+                                        for (
+                                            var a = 0;
+                                            a < group.members.length;
+                                            a++
+                                        ) {
+                                            var member = group.members[a];
+
+                                            if (
+                                                member._id.toString() ==
+                                                user._id.toString()
+                                            ) {
+                                                isMember = true;
+                                                break;
+                                            }
+                                        }
+
+                                        if (!isMember) {
+                                            result.json({
+                                                status: "error",
+                                                message:
+                                                    "Sorry, you are not a member of this group.",
+                                            });
+                                            return;
+                                        }
+
+                                        database.collection("posts").insertOne(
+                                            {
+                                                caption: caption,
+                                                image: image,
+                                                video: video,
+                                                type: type,
+                                                createdAt: createdAt,
+                                                likers: [],
+                                                comments: [],
+                                                shares: [],
+                                                user: {
+                                                    _id: group._id,
+                                                    name: group.name,
+                                                    profileImage: group.coverPhoto,
+                                                },
+                                                uploader: {
+                                                    _id: user._id,
+                                                    name: user.name,
+                                                    profileImage: user.profileImage,
+                                                },
+                                            },
+                                            function (error, data) {
+                                                result.json({
+                                                    status: "success",
+                                                    message:
+                                                        "Post has been uploaded.",
+                                                });
+                                            }
+                                        );
+                                    }
+                                }
+                            );
                         } else {
                             database.collection("posts").insertOne(
                                 {
@@ -590,6 +662,16 @@ http.listen(3000, function () {
 
                         for (var a = 0; a < user.pages.length; a++) {
                             ids.push(user.pages[a]._id);
+                        }
+
+                        for (var a = 0; a < user.groups.length; a++) {
+                            if (user.groups[a].status == "Accepted") {
+                                ids.push(user.groups[a]._id);
+                            }
+                        }
+
+                        for (var a = 0; a < user.friends.length; a++) {
+                            ids.push(user.friends[a]._id);
                         }
 
                         database
@@ -1169,12 +1251,23 @@ http.listen(3000, function () {
                             },
                         })
                         .toArray(function (error, pages) {
-                            result.json({
-                                status: "success",
-                                message: "Record has been fetched",
-                                data: data,
-                                pages: pages,
-                            });
+                            database
+                                .collection("groups")
+                                .find({
+                                    name: {
+                                        $regex: ".*" + query + ".*",
+                                        $options: "i",
+                                    },
+                                })
+                                .toArray(function (error, groups) {
+                                    result.json({
+                                        status: "success",
+                                        message: "Record has been fetched",
+                                        data: data,
+                                        pages: pages,
+                                        groups: groups,
+                                    });
+                                });
                         });
                 });
         });
@@ -1345,12 +1438,232 @@ http.listen(3000, function () {
             );
         });
 
-        app.get("/groups", function (request, result) {
-            result.render("groups");
-        });
+        /*================================
+        Notifications
+        ================================*/
 
         app.get("/notifications", function (request, result) {
             result.render("notifications");
+        });
+
+        app.post("/acceptRequestJoinGroup", function (request, result) {
+            var accessToken = request.fields.accessToken;
+            var _id = request.fields._id;
+            var groupId = request.fields.groupId;
+            var userId = request.fields.userId;
+
+            database.collection("users").findOne(
+                {
+                    accessToken: accessToken,
+                },
+                function (error, user) {
+                    if (user == null) {
+                        result.json({
+                            status: "error",
+                            message: "User has been logged out. Please login again.",
+                        });
+                    } else {
+                        database.collection("groups").findOne(
+                            {
+                                _id: ObjectId(groupId),
+                            },
+                            function (error, group) {
+                                if (group == null) {
+                                    result.json({
+                                        status: "error",
+                                        message: "Group does not exist.",
+                                    });
+                                } else {
+                                    if (
+                                        group.user._id.toString() !=
+                                        user._id.toString()
+                                    ) {
+                                        result.json({
+                                            status: "error",
+                                            message:
+                                                "Sorry, you do not  own this group.",
+                                        });
+                                        return;
+                                    }
+
+                                    database.collection("groups").updateOne(
+                                        {
+                                            $and: [
+                                                {
+                                                    _id: group._id,
+                                                },
+                                                {
+                                                    "members._id": ObjectId(userId),
+                                                },
+                                            ],
+                                        },
+                                        {
+                                            $set: {
+                                                "members.$.status": "Accepted",
+                                            },
+                                        },
+                                        function (error, data) {
+                                            database.collection("users").updateOne(
+                                                {
+                                                    $and: [
+                                                        {
+                                                            accessToken: accessToken,
+                                                        },
+                                                        {
+                                                            "notifications.groupId":
+                                                                group._id,
+                                                        },
+                                                    ],
+                                                },
+                                                {
+                                                    $set: {
+                                                        "notifications.$.status":
+                                                            "Accepted",
+                                                    },
+                                                },
+                                                function (error, data) {
+                                                    database
+                                                        .collection("users")
+                                                        .updateOne(
+                                                            {
+                                                                $and: [
+                                                                    {
+                                                                        _id: ObjectId(
+                                                                            userId
+                                                                        ),
+                                                                    },
+                                                                    {
+                                                                        "groups._id":
+                                                                            group._id,
+                                                                    },
+                                                                ],
+                                                            },
+                                                            {
+                                                                $set: {
+                                                                    "groups.$.status":
+                                                                        "Accepted",
+                                                                },
+                                                            },
+                                                            function (error, data) {
+                                                                result.json({
+                                                                    status:
+                                                                        "success",
+                                                                    message:
+                                                                        "Group join request has been accepted.",
+                                                                });
+                                                            }
+                                                        );
+                                                }
+                                            );
+                                        }
+                                    );
+                                }
+                            }
+                        );
+                    }
+                }
+            );
+        });
+
+        app.post("/rejectRequestJoinGroup", function (request, result) {
+            var accessToken = request.fields.accessToken;
+            var _id = request.fields._id;
+            var groupId = request.fields.groupId;
+            var userId = request.fields.userId;
+
+            database.collection("users").findOne(
+                {
+                    accessToken: accessToken,
+                },
+                function (error, user) {
+                    if (user == null) {
+                        result.json({
+                            status: "error",
+                            message: "User has been logged out. Please login again.",
+                        });
+                    } else {
+                        database.collection("groups").findOne(
+                            {
+                                _id: ObjectId(groupId),
+                            },
+                            function (error, group) {
+                                if (user == null) {
+                                    result.json({
+                                        status: "error",
+                                        message: "Group does not exist.",
+                                    });
+                                } else {
+                                    if (
+                                        group.user._id.toString() !=
+                                        user._id.toString()
+                                    ) {
+                                        result.json({
+                                            status: "error",
+                                            message:
+                                                "Sorry, you do not  own this group.",
+                                        });
+                                        return;
+                                    }
+
+                                    database.collection("groups").updateOne(
+                                        {
+                                            _id: group._id,
+                                        },
+                                        {
+                                            $pull: {
+                                                members: {
+                                                    _id: ObjectId(userId),
+                                                },
+                                            },
+                                        },
+                                        function (error, data) {
+                                            database.collection("users").updateOne(
+                                                {
+                                                    accessToken: accessToken,
+                                                },
+                                                {
+                                                    $pull: {
+                                                        notifications: {
+                                                            groupId: group._id,
+                                                        },
+                                                    },
+                                                },
+                                                function (error, data) {
+                                                    database
+                                                        .collection("users")
+                                                        .updateOne(
+                                                            {
+                                                                _id: ObjectId(
+                                                                    userId
+                                                                ),
+                                                            },
+                                                            {
+                                                                $pull: {
+                                                                    groups: {
+                                                                        _id:
+                                                                            group._id,
+                                                                    },
+                                                                },
+                                                            },
+                                                            function (error, data) {
+                                                                result.json({
+                                                                    status:
+                                                                        "success",
+                                                                    message:
+                                                                        "Group join request has been rejected.",
+                                                                });
+                                                            }
+                                                        );
+                                                }
+                                            );
+                                        }
+                                    );
+                                }
+                            }
+                        );
+                    }
+                }
+            );
         });
 
         app.post("/markNotificationsAsRead", function (request, result) {
@@ -1528,7 +1841,7 @@ http.listen(3000, function () {
                     } else {
                         users[user._id] = socketID;
                         result.json({
-                            status: "status",
+                            status: "success",
                             message: "Socket has been connected",
                         });
                     }
@@ -1741,8 +2054,364 @@ http.listen(3000, function () {
             );
         });
 
+        /*================================
+        Group
+        ================================*/
+        app.get("/createGroup", function (request, result) {
+            result.render("createGroup");
+        });
+
+        app.post("/createGroup", function (request, result) {
+            var accessToken = request.fields.accessToken;
+            var name = request.fields.name;
+            var additionalInfo = request.fields.additionalInfo;
+            var coverPhoto = "";
+
+            database.collection("users").findOne(
+                {
+                    accessToken: accessToken,
+                },
+                function (error, user) {
+                    if (user == null) {
+                        result.json({
+                            status: "error",
+                            message: "User has been logged out. Please login again.",
+                        });
+                    } else {
+                        if (
+                            request.files.coverPhoto.size > 0 &&
+                            request.files.coverPhoto.type.includes("image")
+                        ) {
+                            coverPhoto =
+                                "public/images/" +
+                                // new Date().getTime() +
+                                // "-" +
+                                request.files.coverPhoto.name;
+                            fileSystem.rename(
+                                request.files.coverPhoto.path,
+                                coverPhoto,
+                                function (error) {
+                                    //
+                                }
+                            );
+                            database.collection("groups").insertOne(
+                                {
+                                    name: name,
+                                    additionalInfo: additionalInfo,
+                                    coverPhoto: coverPhoto,
+                                    members: [
+                                        {
+                                            _id: user._id,
+                                            name: user.name,
+                                            profileImage: user.profileImage,
+                                            status: "Accepted",
+                                        },
+                                    ],
+                                    user: {
+                                        _id: user._id,
+                                        name: user.name,
+                                        profileImage: user.profileImage,
+                                    },
+                                },
+                                function (error, data) {
+                                    database.collection("users").updateOne(
+                                        {
+                                            accessToken: accessToken,
+                                        },
+                                        {
+                                            $push: {
+                                                groups: {
+                                                    _id: data.insertedId,
+                                                    name: name,
+                                                    coverPhoto: coverPhoto,
+                                                    status: "Accepted",
+                                                },
+                                            },
+                                        },
+                                        function (error, data) {
+                                            result.json({
+                                                status: "success",
+                                                message: "Groups has been created",
+                                            });
+                                        }
+                                    );
+                                }
+                            );
+                        } else {
+                            result.json({
+                                status: "error",
+                                message: "Please select a cover photo.",
+                            });
+                        }
+                    }
+                }
+            );
+        });
+
+        app.get("/groups", function (request, result) {
+            result.render("groups");
+        });
+
+        app.post("/getGroups", function (request, result) {
+            var accessToken = request.fields.accessToken;
+
+            database.collection("users").findOne(
+                {
+                    accessToken: accessToken,
+                },
+                function (error, user) {
+                    if (user == null) {
+                        result.json({
+                            status: "error",
+                            message: "User has been logged out. Please login again.",
+                        });
+                    } else {
+                        database
+                            .collection("groups")
+                            .find({
+                                $or: [
+                                    {
+                                        "user._id": user._id,
+                                    },
+                                    {
+                                        "members._id": user._id,
+                                    },
+                                ],
+                            })
+                            .toArray(function (error, data) {
+                                result.json({
+                                    status: "success",
+                                    message: "Record has been fetched.",
+                                    data: data,
+                                });
+                            });
+                    }
+                }
+            );
+        });
+
+        app.get("/group/:_id", function (request, result) {
+            var _id = request.params._id;
+
+            database.collection("groups").findOne(
+                {
+                    _id: ObjectId(_id),
+                },
+                function (error, group) {
+                    if (group == null) {
+                        result.json({
+                            status: "error",
+                            message: "Group does not exist.",
+                        });
+                    } else {
+                        result.render("singleGroup", {
+                            _id: _id,
+                        });
+                    }
+                }
+            );
+        });
+
+        app.post("/getGroupDetail", function (request, result) {
+            var _id = request.fields._id;
+
+            database.collection("groups").findOne(
+                {
+                    _id: ObjectId(_id),
+                },
+                function (error, group) {
+                    if (group == null) {
+                        result.json({
+                            status: "error",
+                            message: "Group does not exist.",
+                        });
+                    } else {
+                        database
+                            .collection("posts")
+                            .find({
+                                $and: [
+                                    {
+                                        "user._id": group._id,
+                                    },
+                                    {
+                                        type: "group_post",
+                                    },
+                                ],
+                            })
+                            .toArray(function (error, posts) {
+                                result.json({
+                                    status: "success",
+                                    message: "Record has been fetched",
+                                    data: group,
+                                    posts: posts,
+                                });
+                            });
+                    }
+                }
+            );
+        });
+
         app.post("/toggleJoinGroup", function (request, result) {
-            //
+            var accessToken = request.fields.accessToken;
+            var _id = request.fields._id;
+
+            database.collection("users").findOne(
+                {
+                    accessToken: accessToken,
+                },
+                function (error, user) {
+                    if (user == null) {
+                        result.json({
+                            status: "error",
+                            message: "User has been logged out. Please login again.",
+                        });
+                    } else {
+                        database.collection("groups").findOne(
+                            {
+                                _id: ObjectId(_id),
+                            },
+                            function (error, group) {
+                                if (group == null) {
+                                    result.json({
+                                        status: "error",
+                                        message: "Group does not exist.",
+                                    });
+                                } else {
+                                    var isMember = false;
+                                    for (var a = 0; a < group.members.length; a++) {
+                                        var member = group.members[a];
+
+                                        if (
+                                            member._id.toString() ==
+                                            user._id.toString()
+                                        ) {
+                                            isMember = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if (isMember) {
+                                        database.collection("groups").updateOne(
+                                            {
+                                                _id: ObjectId(_id),
+                                            },
+                                            {
+                                                $pull: {
+                                                    members: {
+                                                        _id: user._id,
+                                                    },
+                                                },
+                                            },
+                                            function (error, data) {
+                                                database
+                                                    .collection("users")
+                                                    .updateOne(
+                                                        {
+                                                            accessToken: accessToken,
+                                                        },
+                                                        {
+                                                            $pull: {
+                                                                groups: {
+                                                                    _id: ObjectId(
+                                                                        _id
+                                                                    ),
+                                                                },
+                                                            },
+                                                        },
+                                                        function (error, data) {
+                                                            result.json({
+                                                                status: "leaved",
+                                                                message:
+                                                                    "Group has been left.",
+                                                            });
+                                                        }
+                                                    );
+                                            }
+                                        );
+                                    } else {
+                                        database.collection("groups").updateOne(
+                                            {
+                                                _id: ObjectId(_id),
+                                            },
+                                            {
+                                                $push: {
+                                                    members: {
+                                                        _id: user._id,
+                                                        name: user.name,
+                                                        profileImage:
+                                                            user.profileImage,
+                                                        status: "Pending",
+                                                    },
+                                                },
+                                            },
+                                            function (error, data) {
+                                                database
+                                                    .collection("users")
+                                                    .updateOne(
+                                                        {
+                                                            accessToken: accessToken,
+                                                        },
+                                                        {
+                                                            $push: {
+                                                                groups: {
+                                                                    _id: group._id,
+                                                                    name: group.name,
+                                                                    coverPhoto:
+                                                                        group.coverPhoto,
+                                                                    status:
+                                                                        "Pending",
+                                                                },
+                                                            },
+                                                        },
+                                                        function (error, data) {
+                                                            database
+                                                                .collection("users")
+                                                                .updateOne(
+                                                                    {
+                                                                        _id:
+                                                                            group
+                                                                                .user
+                                                                                ._id,
+                                                                    },
+                                                                    {
+                                                                        $push: {
+                                                                            notifications: {
+                                                                                _id: ObjectId(),
+                                                                                type:
+                                                                                    "group_join_request",
+                                                                                content:
+                                                                                    user.name +
+                                                                                    " sent a request to join your group.",
+                                                                                profileImage:
+                                                                                    user.profileImage,
+                                                                                groupId:
+                                                                                    group._id,
+                                                                                userId:
+                                                                                    user._id,
+                                                                                status:
+                                                                                    "Pending",
+                                                                                createdAt: new Date().getTime(),
+                                                                            },
+                                                                        },
+                                                                    }
+                                                                );
+
+                                                            result.json({
+                                                                status: "success",
+                                                                message:
+                                                                    "Request to join group has been sent.",
+                                                            });
+                                                        }
+                                                    );
+                                            }
+                                        );
+                                    }
+                                }
+                            }
+                        );
+                    }
+                }
+            );
         });
 
         app.post("/sendFriendRequest", function (request, result) {

@@ -83,6 +83,14 @@
 							getMyPages()
 						}
 
+						if(typeof isGroups !== "undefined" && isGroups) {
+							getGroups()
+						}
+
+						if(typeof isGroupDetail !== "undefined" && isGroupDetail) {
+							getGroupDetail()
+						}
+
 						if (typeof isPostDetail !== "undefined" && isPostDetail) {
 							showPostDetails();
 						}
@@ -90,7 +98,8 @@
 						if (typeof isNotifications !== "undefined" && isNotifications) {
 							showNotifications();
 							markNotificationsAsRead();
-						} else {
+						} 
+						else {
 							var notificationsCount = 0;
 							for (var a = 0; a < window.user.notifications.length; a++) {
 								if (!window.user.notifications[a].isRead) {
