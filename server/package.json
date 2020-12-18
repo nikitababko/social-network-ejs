@@ -1,0 +1,15 @@
+{
+    "name": "social-network-server",
+    "author": {
+        "name": "nikita",
+        "email": "niki.babko@gmail.com"
+    },
+    "version": "1.0.0",
+    "description": "Example of social network.",
+    "main": "app.js",
+    "repository": {
+        "url": "https://github.com/nikitababko/social-network",
+        "type": "git"
+    },
+    "license": "MIT"
+}
