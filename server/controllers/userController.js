@@ -149,30 +149,30 @@ exports.addUser = (req, res) => {
                         password: hash,
                     });
 
-                    user.save()
-                        .then((user) => {
-                            const following = new Following({ user: user._id }).save();
-                            const followers = new Followers({ user: user._id }).save();
-                            Promise.all([following, followers]).then(() => {
-                                if (process.env.ENABLE_SEND_EMAIL === "true") {
-                                    emailHandler.sendVerificationEmail({
-                                        email: user.email,
-                                        _id: user._id,
-                                        username: user.username,
-                                    });
-                                    return res.status(201).json({
-                                        message: "Verify your email address",
-                                    });
-                                } else {
-                                    return res.status(201).json({
-                                        message: "Account created",
-                                    });
-                                }
-                            });
-                        })
-                        .catch((err) => {
-                            return res.status(500).json({ message: err.message });
-                        });
+                    // user.save()
+                    //     .then((user) => {
+                    //         const following = new Following({ user: user._id }).save();
+                    //         const followers = new Followers({ user: user._id }).save();
+                    //         Promise.all([following, followers]).then(() => {
+                    //             if (process.env.ENABLE_SEND_EMAIL === "true") {
+                    //                 emailHandler.sendVerificationEmail({
+                    //                     email: user.email,
+                    //                     _id: user._id,
+                    //                     username: user.username,
+                    //                 });
+                    //                 return res.status(201).json({
+                    //                     message: "Verify your email address",
+                    //                 });
+                    //             } else {
+                    //                 return res.status(201).json({
+                    //                     message: "Account created",
+                    //                 });
+                    //             }
+                    //         });
+                    //     })
+                    //     .catch((err) => {
+                    //         return res.status(500).json({ message: err.message });
+                    //     });
                 }
             });
         } else {
@@ -314,27 +314,9 @@ exports.deleteUser = (req, res) => {
 //     })
 //         .select("username email")
 //         .then((user) => {
-//             if (user.length) {
-//                 const { username, email } = user[0];
-
-//                 if (username === req.body.username) {
-//                     return res.status(409).json({
-//                         message: "Username exists",
-//                     });
-//                 }
-
-//                 if (email === req.body.email) {
-//                     return res.status(409).json({
-//                         message: "Email exists",
-//                     });
-//                 }
+//
 //             } else {
-//                 User.findByIdAndUpdate(
-//                     req.userData.userId,
-//                     {
-//                         ...req.body,
-//                     },
-//                     { new: true }
+//
 //                 )
 //                     .select("firstName lastName username email bio")
 //                     .then((user) => {
@@ -416,74 +398,74 @@ exports.getUserData = (req, res, next) => {
     //     return res.status(200).json({ user: req.body.user });
     // };
 
-    exports.getUserProfileData = (req, res, next) => {
-        if (req.userData.username === req.body.username) {
-            return res.status(200).json({ user: { loggedInUser: true } });
-        }
+    // exports.getUserProfileData = (req, res, next) => {
+    //     if (req.userData.username === req.body.username) {
+    //         return res.status(200).json({ user: { loggedInUser: true } });
+    //     }
 
-        User.aggregate([
-            { $match: { username: req.body.username } },
-            {
-                $lookup: {
-                    from: "followings",
-                    localField: "_id",
-                    foreignField: "user",
-                    as: "followings",
-                },
-            },
-            {
-                $lookup: {
-                    from: "followers",
-                    localField: "_id",
-                    foreignField: "user",
-                    as: "followers",
-                },
-            },
-            {
-                $project: {
-                    firstName: 1,
-                    lastName: 1,
-                    username: 1,
-                    bio: 1,
-                    profilePicture: 1,
-                    followings: {
-                        $size: { $arrayElemAt: ["$followings.following", 0] },
-                    },
-                    followers: {
-                        $size: { $arrayElemAt: ["$followers.followers", 0] },
-                    },
-                },
-            },
-        ])
-            .then((user) => {
-                if (user.length < 1) {
-                    return res.status(404).json({
-                        message: "User not found",
-                    });
-                }
+    //     User.aggregate([
+    //         { $match: { username: req.body.username } },
+    //         {
+    //             $lookup: {
+    //                 from: "followings",
+    //                 localField: "_id",
+    //                 foreignField: "user",
+    //                 as: "followings",
+    //             },
+    //         },
+    //         {
+    //             $lookup: {
+    //                 from: "followers",
+    //                 localField: "_id",
+    //                 foreignField: "user",
+    //                 as: "followers",
+    //             },
+    //         },
+    //         {
+    //             $project: {
+    //                 firstName: 1,
+    //                 lastName: 1,
+    //                 username: 1,
+    //                 bio: 1,
+    //                 profilePicture: 1,
+    //                 followings: {
+    //                     $size: { $arrayElemAt: ["$followings.following", 0] },
+    //                 },
+    //                 followers: {
+    //                     $size: { $arrayElemAt: ["$followers.followers", 0] },
+    //                 },
+    //             },
+    //         },
+    //     ])
+    //         .then((user) => {
+    //             if (user.length < 1) {
+    //                 return res.status(404).json({
+    //                     message: "User not found",
+    //                 });
+    //             }
 
-                Post.find({
-                    author: mongoose.Types.ObjectId(user[0]._id),
-                })
-                    .countDocuments()
-                    .then((postsCount) => {
-                        let data = {
-                            ...user[0],
-                            postsCount,
-                        };
-                        req.body.user = data;
-                        next();
-                    })
-                    .catch((err) => {
-                        return res.status(500).json({
-                            message: err.message,
-                        });
-                    });
-            })
-            .catch((err) => {
-                return res.status(500).json({
-                    message: err.message,
-                });
-            });
-    };
+    //             Post.find({
+    //                 author: mongoose.Types.ObjectId(user[0]._id),
+    //             })
+    //                 .countDocuments()
+    //                 .then((postsCount) => {
+    //                     let data = {
+    //                         ...user[0],
+    //                         postsCount,
+    //                     };
+    //                     req.body.user = data;
+    //                     next();
+    //                 })
+    //                 .catch((err) => {
+    //                     return res.status(500).json({
+    //                         message: err.message,
+    //                     });
+    //                 });
+    //         })
+    //         .catch((err) => {
+    //             return res.status(500).json({
+    //                 message: err.message,
+    //             });
+    //         });
+    // };
 };
