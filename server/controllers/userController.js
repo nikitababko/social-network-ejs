@@ -5,7 +5,6 @@ const User = mongoose.model("User");
 const Post = mongoose.model("Post");
 const Following = mongoose.model("Following");
 const Followers = mongoose.model("Follower");
-const notificationHandler = require("../handlers/notificationHandler");
 const emailHandler = require("../handlers/emailHandler");
 
 exports.activate = (req, res) => {
@@ -305,61 +304,61 @@ exports.deleteUser = (req, res) => {
             });
     });
 };
-//{ $match: { $or: [{ email: req.body.email }, { username: req.body.username }], _id: { $not: req.userData.username }} }
-exports.updateUser = (req, res) => {
-    User.find({
-        $and: [
-            { $or: [{ email: req.body.email }, { username: req.body.username }] },
-            { _id: { $ne: req.userData.userId } },
-        ],
-    })
-        .select("username email")
-        .then((user) => {
-            if (user.length) {
-                const { username, email } = user[0];
+// //{ $match: { $or: [{ email: req.body.email }, { username: req.body.username }], _id: { $not: req.userData.username }} }
+// exports.updateUser = (req, res) => {
+//     User.find({
+//         $and: [
+//             { $or: [{ email: req.body.email }, { username: req.body.username }] },
+//             { _id: { $ne: req.userData.userId } },
+//         ],
+//     })
+//         .select("username email")
+//         .then((user) => {
+//             if (user.length) {
+//                 const { username, email } = user[0];
 
-                if (username === req.body.username) {
-                    return res.status(409).json({
-                        message: "Username exists",
-                    });
-                }
+//                 if (username === req.body.username) {
+//                     return res.status(409).json({
+//                         message: "Username exists",
+//                     });
+//                 }
 
-                if (email === req.body.email) {
-                    return res.status(409).json({
-                        message: "Email exists",
-                    });
-                }
-            } else {
-                User.findByIdAndUpdate(
-                    req.userData.userId,
-                    {
-                        ...req.body,
-                    },
-                    { new: true }
-                )
-                    .select("firstName lastName username email bio")
-                    .then((user) => {
-                        const token = jwt.sign(
-                            {
-                                email: user.email,
-                                userId: user._id,
-                                username: user.username,
-                            },
-                            process.env.JWT_KEY,
-                            {
-                                expiresIn: "30m",
-                            }
-                        );
+//                 if (email === req.body.email) {
+//                     return res.status(409).json({
+//                         message: "Email exists",
+//                     });
+//                 }
+//             } else {
+//                 User.findByIdAndUpdate(
+//                     req.userData.userId,
+//                     {
+//                         ...req.body,
+//                     },
+//                     { new: true }
+//                 )
+//                     .select("firstName lastName username email bio")
+//                     .then((user) => {
+//                         const token = jwt.sign(
+//                             {
+//                                 email: user.email,
+//                                 userId: user._id,
+//                                 username: user.username,
+//                             },
+//                             process.env.JWT_KEY,
+//                             {
+//                                 expiresIn: "30m",
+//                             }
+//                         );
 
-                        return res.status(200).json({ user, token: "Bearer " + token });
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                        return res.status(500).json({ message: err });
-                    });
-            }
-        });
-};
+//                         return res.status(200).json({ user, token: "Bearer " + token });
+//                     })
+//                     .catch((err) => {
+//                         console.log(err);
+//                         return res.status(500).json({ message: err });
+//                     });
+//             }
+//         });
+// };
 
 exports.getUserData = (req, res, next) => {
     let q;
@@ -413,9 +412,9 @@ exports.getUserData = (req, res, next) => {
         ];
     }
 
-    exports.sendUserData = (req, res) => {
-        return res.status(200).json({ user: req.body.user });
-    };
+    // exports.sendUserData = (req, res) => {
+    //     return res.status(200).json({ user: req.body.user });
+    // };
 
     exports.getUserProfileData = (req, res, next) => {
         if (req.userData.username === req.body.username) {

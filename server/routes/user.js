@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/userController");
 const checkAuth = require("../middleware/checkAuth");
-const checkUser = require("../middleware/checkUser");
 const checkEmailEnv = require("../middleware/checkEmailEnv");
 const userValidator = require("../middleware/schemaValidators/userValidator");
 const verificationCheck = require("../middleware/verificationCheck");
