@@ -1,0 +1,97 @@
+users:
+- _id
+- bio
+- profilePicture
+- activityStatus
+- activated
+- email
+- firstname
+- lastname
+- username
+- password
+- date
+- postLikes
+  - _id
+  - post
+
+followers:
+- _id
+- user
+- followers
+  - _id
+  - user
+
+followings:
+- _id
+- user
+- following
+  - id
+  - user
+
+chatrooms:
+- _id
+- members[]
+- roomname
+- messages
+- lastActive
+- createdAt
+
+messages:
+- _id
+- read
+- roomid
+- sender
+- text
+- receiver
+- messageType
+- createdAt
+
+comments:
+- _id
+- post
+- author
+- text
+- createdAt
+
+commentlikes:
+- _id
+- comment
+- user_likes[]
+  - _id
+  - author
+
+commentreplylikes:
+- _id
+- comment
+- user_likes
+
+posts:
+- _id
+- description
+- hashtags
+- tags
+- author
+- photo
+- createdAt
+
+postlikes:
+- _id
+- post
+- user_likes[]
+  - _id
+  - author
+
+replies:
+- _id
+- commentAt
+- author
+- text
+- createdAt
+
+notifications:
+- _id
+- receiver[]
+- read
+- sender
+- type
+- createdAt
