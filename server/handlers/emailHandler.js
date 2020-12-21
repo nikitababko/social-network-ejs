@@ -18,7 +18,24 @@ exports.sendVerificationEmail = (data) => {
 
     // config for mailserver and mail, input your data
     const config = {
-        //    ...
+        mailserver: {
+            service: "gmail",
+            auth: {
+                user: process.env.EMAILUSER,
+                pass: process.env.EMAILPASS,
+            },
+        },
+        mail: {
+            from: process.env.EMAILUSER,
+            to: email,
+            subject: "Account verification",
+            template: "emailVerify",
+            context: {
+                token,
+                username,
+                host: process.env.HOST,
+            },
+        },
     };
 
     const sendMail = async ({ mailserver, mail }) => {
