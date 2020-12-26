@@ -8,7 +8,7 @@
     "description": "Example of social network.",
     "main": "app.js",
     "repository": {
-        "url": "https://github.com/nikitababko/social-network",
+        "url": "https://github.com/nikitababko/social-network-netlife",
         "type": "git"
     },
     "license": "MIT",
@@ -16,7 +16,10 @@
         "bcrypt": "^5.0.0",
         "express": "^4.17.1",
         "hbs": "^4.1.1",
+        "jimp": "^0.16.1",
+        "linkify": "^0.2.1",
         "mongoose": "^5.11.8",
+        "multer": "^1.4.2",
         "nodemailer": "^6.4.17"
     }
 }
