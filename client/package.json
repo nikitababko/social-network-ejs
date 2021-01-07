@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@babel/core": "7.12.3",
+    "@babel/plugin-syntax-jsx": "^7.12.1",
     "@pmmmwh/react-refresh-webpack-plugin": "0.4.2",
     "@svgr/webpack": "5.4.0",
     "@testing-library/jest-dom": "^5.11.4",
@@ -94,7 +95,7 @@
     "throttle-debounce": "^3.0.1",
     "ts-pnp": "1.2.0",
     "url-loader": "4.1.1",
-    "uuid": "^8.3.2",
+    "uuid": "3.3.3",
     "web-vitals": "^0.2.4",
     "webpack": "4.44.2",
     "webpack-dev-server": "3.11.0",
