@@ -12,14 +12,40 @@
         "type": "git"
     },
     "license": "MIT",
+    "scripts": {
+        "start": "node ./bin/www",
+        "server": "nodemon ./bin/www",
+        "client": "npm start --prefix ../client",
+        "test": "mocha --recursive --exit --timeout 10000",
+        "dev": "concurrently \"npm run server\" \"npm run client\""
+    },
     "dependencies": {
+        "@hapi/joi": "^17.1.1",
         "bcrypt": "^5.0.0",
+        "concurrently": "^5.3.0",
+        "debug": "^4.3.1",
+        "dotenv": "^8.2.0",
         "express": "^4.17.1",
+        "express-rate-limit": "^5.2.3",
         "hbs": "^4.1.1",
+        "helmet": "^4.3.1",
+        "http-errors": "^1.8.0",
         "jimp": "^0.16.1",
+        "joi-objectid": "^3.0.1",
+        "jsonwebtoken": "^8.5.1",
         "linkify": "^0.2.1",
         "mongoose": "^5.11.8",
+        "morgan": "^1.10.0",
         "multer": "^1.4.2",
-        "nodemailer": "^6.4.17"
+        "nodemailer": "^6.4.17",
+        "nodemailer-express-handlebars": "^4.0.0",
+        "nodemon": "^2.0.7",
+        "socket.io": "^3.0.5",
+        "uuid": "^8.3.2"
+    },
+    "devDependencies": {
+        "chai": "^4.2.0",
+        "mocha": "^8.2.1",
+        "supertest": "^6.0.1"
     }
 }
