@@ -1,0 +1,123 @@
+.auth {
+    $auth: &;
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+
+    &__column {
+        width: 50%;
+
+        &:nth-child(1) {
+            height: 100vh;
+            background-color: #00bcd4;
+        }
+    }
+
+    &__right {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0 100px 0;
+        background-color: #fff;
+
+        #{$auth}__header {
+            display: flex;
+            flex-direction: column;
+
+            .title {
+                margin-bottom: 15px;
+                font-size: 30px;
+            }
+
+            .text {
+                margin-bottom: 15px;
+                font-size: 20px;
+            }
+        }
+
+        & > * {
+            border: none !important;
+        }
+
+        .content {
+            .header {
+                margin-bottom: 30px;
+            }
+        }
+
+        .form {
+            padding-left: 0;
+            margin-bottom: 50px !important;
+
+            &__group {
+                display: flex;
+                flex-direction: column !important;
+                margin-bottom: 50px !important;
+
+                .field {
+                    // width: 300px !important;
+                    font-size: 15px;
+
+                    &:nth-child(1) {
+                        margin-bottom: 50px !important;
+                    }
+
+                    label {
+                        margin-bottom: 10px;
+                    }
+                }
+            }
+
+            .button {
+                padding: 10px 100px;
+                // width: 285px !important;
+                font-family: "Roboto", sans-serif;
+                font-size: 15px !important;
+                font-weight: 400;
+                letter-spacing: 1px;
+                background-color: #00bcd4;
+                opacity: 1 !important;
+                transition: background-color 0.4s ease-in-out;
+
+                &:hover {
+                    background-color: #009cb0;
+                }
+            }
+        }
+
+        .bottom {
+            width: 400px;
+            font-weight: bold !important;
+            font-size: 15px !important;
+            color: #000 !important;
+            background-color: lighten(#07c4dc, 50%) !important;
+            border: 1px solid #00bcd4 !important;
+
+            a {
+                color: #00bcd4 !important;
+                text-decoration: underline;
+            }
+
+            .icon {
+                margin: 15px auto;
+            }
+
+            i {
+                margin-right: 10px !important;
+            }
+
+            span {
+                color: #00bcd4;
+            }
+        }
+    }
+
+    &__author {
+        font-size: 30px;
+
+        a {
+            color: #00bcd4 !important;
+            text-decoration: underline;
+        }
+    }
+}
