@@ -1,0 +1,27 @@
+.register {
+    $self: &;
+
+    .auth__right {
+        .form {
+            .equal,
+            .required {
+                font-size: 15px;
+
+                label {
+                    margin-bottom: 10px !important;
+                }
+            }
+        }
+
+        #{$self}__group {
+            flex-direction: row !important;
+            margin-bottom: 0 !important;
+
+            .field {
+                &:nth-child(1) {
+                    margin-bottom: 1em !important;
+                }
+            }
+        }
+    }
+}
