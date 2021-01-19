@@ -4,47 +4,44 @@
         "name": "nikita",
         "email": "niki.babko@gmail.com"
     },
-    "version": "1.0.0",
-    "description": "Example of social network.",
-    "main": "app.js",
     "repository": {
         "url": "https://github.com/nikitababko/social-network-netlife",
         "type": "git"
     },
-    "license": "MIT",
+    "version": "0.1.0",
+    "license": "ISC",
     "scripts": {
         "start": "node ./bin/www",
         "server": "nodemon ./bin/www",
-        "client": "npm start --prefix ../client",
+        "client": "npm start --prefix client",
         "test": "mocha --recursive --exit --timeout 10000",
         "dev": "concurrently \"npm run server\" \"npm run client\""
     },
     "dependencies": {
-        "@hapi/joi": "16.1.8",
-        "bcryptjs": "2.4.3",
-        "concurrently": "4.1.0",
-        "debug": "2.6.9",
-        "dotenv": "^8.2.0",
-        "express": "^4.17.1",
-        "express-rate-limit": "^5.2.3",
-        "helmet": "^4.3.1",
-        "http-errors": "^1.8.0",
-        "jimp": "^0.16.1",
+        "@hapi/joi": "^16.1.8",
+        "bcryptjs": "^2.4.3",
+        "concurrently": "^4.1.0",
+        "debug": "~2.6.9",
+        "dotenv": "^6.2.0",
+        "express": "~4.16.0",
+        "express-rate-limit": "^5.0.0",
+        "helmet": "^3.16.0",
+        "http-errors": "~1.6.2",
+        "jimp": "^0.6.8",
         "joi-objectid": "^3.0.1",
         "jsonwebtoken": "^8.5.1",
-        "linkifyjs": "^2.1.9",
-        "mongoose": "^5.11.8",
-        "morgan": "^1.10.0",
-        "multer": "^1.4.2",
-        "nodemailer": "^6.4.17",
-        "nodemailer-express-handlebars": "^4.0.0",
-        "nodemon": "^2.0.7",
-        "socket.io": "^3.0.5",
-        "uuid": "3.3.2"
+        "linkifyjs": "^2.1.8",
+        "mongoose": "^5.4.6",
+        "morgan": "~1.9.0",
+        "multer": "^1.4.1",
+        "nodemailer": "^6.4.2",
+        "nodemailer-express-handlebars": "^3.1.0",
+        "socket.io": "^2.2.0",
+        "uuid": "^3.3.2"
     },
     "devDependencies": {
         "chai": "^4.2.0",
-        "mocha": "^8.2.1",
-        "supertest": "^6.0.1"
+        "mocha": "^7.1.2",
+        "supertest": "^4.0.2"
     }
 }
