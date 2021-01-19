@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import { Helmet } from "react-helmet";
 import $ from "jquery";
 
 import "./Logo.scss";
@@ -44,12 +43,6 @@ const Logo = () => {
 
     return (
         <div className="middle">
-            {/* <Helmet>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-                <script src="https://rawgit.com/Zet-Tools/zPath.js/master/jquery.zpath.js"></script>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.js"></script>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/1.1.4/typed.min.js"></script>
-            </Helmet> */}
             <svg
                 className="maze"
                 preserveAspectRatio="xMinYMin slice"
