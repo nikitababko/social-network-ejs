@@ -1,4 +1,6 @@
-# Social network app
+# Social network app 'NetLife'
+
+[You can see screenshots of the messenger below](#screenshots)
 
 ## Install
 
@@ -62,3 +64,25 @@ TEST_DATABASE="social_network_test"
 -   Get notification when someone likes your post, comment, reply, tag you on post or reply on comment
 -   Chat send text message, image
 -   Seen feature and activity status of user
+
+## <a name="screenshots">Screenshots</a>
+
+<div align="center" >
+  <h3>Sign in</h3>
+  <img style="margin:50px 0;" src="./client/public/assets/images/readme/signin.jpg" />
+
+  <h3>Sign up</h3>
+  <img style="margin:50px 0;" src="./client/public/assets/images/readme/signup.jpg" />
+
+  <h3>Home</h3>
+  <img style="margin:50px 0;" src="./client/public/assets/images/readme/home.jpg" />
+
+  <h3>Owner profile</h3>
+  <img style="margin:50px 0;" src="./client/public/assets/images/readme/owner-profile.jpg" />
+
+  <h3>User profile</h3>
+  <img style="margin:50px 0;" src="./client/public/assets/images/readme/user-profile.jpg" />
+
+  <h3>Chat</h3>
+  <img style="margin:50px 0;" src="./client/public/assets/images/readme/chat.jpg" />
+</div>
