@@ -26,63 +26,63 @@ TEST_DATABASE="social_network_test"
 
 ### Frontend
 
--   ReactJS + hooks
--   Redux
--   ReduxThunk
--   PropTypes
--   Axios
--   Mapbox-gl
--   Semantic Ui React
--   Emoji Mart
--   Socket.io
--   history
+- ReactJS + hooks
+- Redux
+- ReduxThunk
+- PropTypes
+- Axios
+- Mapbox-gl
+- Semantic Ui React
+- Emoji Mart
+- Socket.io
+- history
 
 ### Backend
 
--   NodeJS / Express
--   MongoDB / Mongoose
--   BcryptJS
--   JsonWebToken
--   Socket.io
--   Multer
--   Nodemailer
--   LinkifyJS
+- NodeJS / Express
+- MongoDB / Mongoose
+- BcryptJS
+- JsonWebToken
+- Socket.io
+- Multer
+- Nodemailer
+- LinkifyJS
 
 ## Features
 
--   Like posts, comments, replies
--   See likes for posts, comments, replies
--   Follow, unfollow
--   Update user information
--   Search users
--   Tag people on post and in comments with autocomplete
--   Send verification email
--   Pagination for home feed, user profile, hashtag page, location page, notifications, comments, replies
+- Like posts, comments, replies
+- See likes for posts, comments, replies
+- Follow, unfollow
+- Update user information
+- Search users
+- Tag people on post and in comments with autocomplete
+- Send verification email
+- Pagination for home feed, user profile, hashtag page, location page, notifications, comments, replies
 
 ### Realtime
 
--   Get notification when someone likes your post, comment, reply, tag you on post or reply on comment
--   Chat send text message, image
--   Seen feature and activity status of user
+- Get notification when someone likes your post, comment, reply, tag you on post or reply on comment
+- Chat send text message, image
+- Seen feature and activity status of user
 
 ## <a name="screenshots">Screenshots</a>
 
 <div align="center" >
   <h3>Sign in</h3>
-  <img style="margin:50px 0;" src="./client/public/assets/images/readme/signin.jpg" />
+  <img style="margin:50px 0;" src="screenshots/signin.jpg" />
 
   <h3>Sign up</h3>
-  <img style="margin:50px 0;" src="./client/public/assets/images/readme/signup.jpg" />
+  <img style="margin:50px 0;" src="screenshots/signup.jpg" />
 
   <h3>Home</h3>
-  <img style="margin:50px 0;" src="./client/public/assets/images/readme/home.jpg" />
+  <img style="margin:50px 0;" src="screenshots/home.jpg" />
 
   <h3>Owner profile</h3>
-  <img style="margin:50px 0;" src="./client/public/assets/images/readme/owner-profile.jpg" />
+  <img style="margin:50px 0;" src="screenshots/owner-profile.jpg" />
 
   <h3>User profile</h3>
-  <img style="margin:50px 0;" src="./client/public/assets/images/readme/user-profile.jpg" />
+  <img style="margin:50px 0;" src="screenshots/user-profile.jpg" />
 
   <h3>Chat</h3>
-  <img style="margin:50px 0;" src="./client/public/assets/images/readme/chat.jpg" />
+  <img style="margin:50px 0;" src="screenshots/chat.jpg" />
 </div>
