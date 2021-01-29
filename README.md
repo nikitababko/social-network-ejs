@@ -1,6 +1,6 @@
 # Social network app 'NetLife'
 
-[You can see screenshots of the messenger below](#screenshots)
+[You can see screenshots of the 'NetLife' below](#screenshots)
 
 ## Install
 
