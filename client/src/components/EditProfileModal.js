@@ -1,8 +1,8 @@
-import React, { Component } from "react";
-import { Button, Message, Modal, Form } from "semantic-ui-react";
-import { connect } from "react-redux";
-import { userActions } from "../actions/userActions";
-import ProfilePictureForm from "./ProfilePictureForm";
+import React, { Component } from 'react';
+import { Button, Message, Modal, Form } from 'semantic-ui-react';
+import { connect } from 'react-redux';
+import { userActions } from '../actions/userActions';
+import ProfilePictureForm from './ProfilePictureForm';
 
 class ImageCropModal extends Component {
   state = { open: false };
@@ -19,9 +19,7 @@ class ImageCropModal extends Component {
         onOpen={this.open}
         onClose={this.close}
         size="small"
-        trigger={
-          <Button size="big" content="Update profile picture" primary fluid />
-        }
+        trigger={<Button size="big" content="Update profile picture" primary fluid />}
       >
         <Modal.Header>Select profile picture</Modal.Header>
         <Modal.Content>
@@ -34,12 +32,12 @@ class ImageCropModal extends Component {
 
 class EditProfileModal extends Component {
   state = {
-    firstName: "",
-    lastName: "",
-    username: "",
-    email: "",
-    bio: "",
-    isDisabled: true
+    firstName: '',
+    lastName: '',
+    username: '',
+    email: '',
+    bio: '',
+    isDisabled: true,
   };
 
   componentDidMount = () => {
@@ -50,7 +48,7 @@ class EditProfileModal extends Component {
       username,
       email,
       bio,
-      isDisabled: true
+      isDisabled: true,
     });
   };
 
@@ -69,7 +67,7 @@ class EditProfileModal extends Component {
 
     const { updaingUser, hasError } = this.props;
     return (
-      <Modal trigger={this.props.children} style={{ color: "reda" }}>
+      <Modal trigger={this.props.children} style={{ color: 'reda' }}>
         <Modal.Header>Edit profile</Modal.Header>
         <Modal.Content>
           <Modal.Description>
@@ -135,7 +133,7 @@ class EditProfileModal extends Component {
                 value={bio}
               />
               <Button
-                style={{ marginBottom: "1%" }}
+                style={{ marginBottom: '1%' }}
                 size="big"
                 content="Update information"
                 disabled={this.state.isDisabled}
@@ -161,7 +159,7 @@ function mapStateToProps(state) {
     lastName,
     username,
     email,
-    bio
+    bio,
   };
 }
 

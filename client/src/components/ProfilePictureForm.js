@@ -1,28 +1,27 @@
-import React, { PureComponent } from "react";
-import ReactCrop from "react-image-crop";
-import "react-image-crop/dist/ReactCrop.css";
+import React, { PureComponent } from 'react';
+import ReactCrop from 'react-image-crop';
+import 'react-image-crop/dist/ReactCrop.css';
 import {
   image64toCanvasRef,
   extractImageFileExtensionFromBase64,
   base64StringtoFile,
-} from "../reusable/ReusableUtils";
-import { Button } from "semantic-ui-react";
-import { postActions } from "../actions/postActions";
-import { connect } from "react-redux";
-import { alertActions } from "../actions/alertActions";
+} from '../reusable/ReusableUtils';
+import { Button } from 'semantic-ui-react';
+import { postActions } from '../actions/postActions';
+import { connect } from 'react-redux';
+import { alertActions } from '../actions/alertActions';
 
 const imageMaxSize = 10000000; // bytes
-const acceptedFileTypes =
-  "image/x-png, image/png, image/jpg, image/jpeg, image/gif";
-const acceptedFileTypesArray = acceptedFileTypes.split(",").map((item) => {
+const acceptedFileTypes = 'image/x-png, image/png, image/jpg, image/jpeg, image/gif';
+const acceptedFileTypesArray = acceptedFileTypes.split(',').map((item) => {
   return item.trim();
 });
 
 const initialState = {
-  description: "",
+  description: '',
   imgSrc: null,
   imgSrcExt: null,
-  imageUploadEndpoint: "",
+  imageUploadEndpoint: '',
   crop: {
     aspect: 1,
   },
@@ -56,14 +55,14 @@ class ProfilePictureForm extends PureComponent {
     if (imgSrc) {
       const canvasRef = this.imagePreviewCanvasRef.current;
       const { imgSrcExt } = this.state;
-      const imageData64 = canvasRef.toDataURL("image/" + imgSrcExt);
-      const myFilename = "previewFile." + imgSrcExt;
+      const imageData64 = canvasRef.toDataURL('image/' + imgSrcExt);
+      const myFilename = 'previewFile.' + imgSrcExt;
       // file to be uploaded
       const myNewCroppedFile = base64StringtoFile(imageData64, myFilename);
       const fd = new FormData();
-      fd.append("photo", myNewCroppedFile, myNewCroppedFile.name);
+      fd.append('photo', myNewCroppedFile, myNewCroppedFile.name);
 
-      fd.append("description", this.state.description);
+      fd.append('description', this.state.description);
       const { dispatch } = this.props;
       dispatch(postActions.addProfiePicture(fd));
       this.setState(initialState);
@@ -78,9 +77,7 @@ class ProfilePictureForm extends PureComponent {
       const { dispatch } = this.props;
       if (!acceptedFileTypesArray.includes(currentFileType)) {
         dispatch(
-          alertActions.error(
-            "This file is not allowed. Only images are allowed."
-          )
+          alertActions.error('This file is not allowed. Only images are allowed.')
         );
 
         return false;
@@ -89,9 +86,7 @@ class ProfilePictureForm extends PureComponent {
       if (currentFileSize > imageMaxSize) {
         dispatch(
           alertActions.error(
-            "This file is not allowed. " +
-              currentFileSize +
-              " bytes is too large"
+            'This file is not allowed. ' + currentFileSize + ' bytes is too large'
           )
         );
         return false;
@@ -109,7 +104,7 @@ class ProfilePictureForm extends PureComponent {
         const currentFile = files[0];
         const myFileItemReader = new FileReader();
         myFileItemReader.addEventListener(
-          "load",
+          'load',
           () => {
             // console.log(myFileItemReader.result)
             const myResult = myFileItemReader.result;
@@ -132,12 +127,12 @@ class ProfilePictureForm extends PureComponent {
       <div>
         {imgSrc !== null ? (
           <div>
-            <div style={{ marginBottom: "1%" }}>
+            <div style={{ marginBottom: '1%' }}>
               <label className="ui icon button fluid">
                 <i className="file icon " />
                 Change Image
                 <input
-                  style={{ display: "none" }}
+                  style={{ display: 'none' }}
                   ref={this.fileInputRef}
                   type="file"
                   accept={acceptedFileTypes}
@@ -159,10 +154,7 @@ class ProfilePictureForm extends PureComponent {
               </Button>
             ) : null}
 
-            <canvas
-              style={{ display: "none" }}
-              ref={this.imagePreviewCanvasRef}
-            />
+            <canvas style={{ display: 'none' }} ref={this.imagePreviewCanvasRef} />
           </div>
         ) : (
           <div>
@@ -170,7 +162,7 @@ class ProfilePictureForm extends PureComponent {
               <i className="file icon" />
               Select Image
               <input
-                style={{ display: "none" }}
+                style={{ display: 'none' }}
                 ref={this.fileInputRef}
                 type="file"
                 accept={acceptedFileTypes}

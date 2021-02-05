@@ -1,14 +1,14 @@
-import React from "react";
-import { Comment } from "semantic-ui-react";
-import { Link } from "react-router-dom";
-import { connect } from "react-redux";
-import LikeCommetReply from "./LikeCommetReply";
-import Linkify from "linkifyjs/react";
-import * as linkify from "linkifyjs";
-import hashtag from "linkifyjs/plugins/hashtag";
-import mention from "linkifyjs/plugins/mention";
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
+import React from 'react';
+import { Comment } from 'semantic-ui-react';
+import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
+import LikeCommetReply from './LikeCommetReply';
+import Linkify from 'linkifyjs/react';
+import * as linkify from 'linkifyjs';
+import hashtag from 'linkifyjs/plugins/hashtag';
+import mention from 'linkifyjs/plugins/mention';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
 dayjs.extend(relativeTime);
 
@@ -16,20 +16,20 @@ hashtag(linkify);
 mention(linkify);
 
 const linkifyOptions = {
-  formatHref: function(href, type) {
-    if (type === "hashtag") {
-      href = "/hashtags/" + href.substring(1);
+  formatHref: function (href, type) {
+    if (type === 'hashtag') {
+      href = '/hashtags/' + href.substring(1);
     }
-    if (type === "mention") {
-      href = "/" + href.substring(1);
+    if (type === 'mention') {
+      href = '/' + href.substring(1);
     }
     return href;
   },
   attributes: {
     target: {
-      url: "_blank"
-    }
-  }
+      url: '_blank',
+    },
+  },
 };
 
 const CommentReply = ({ username, comment, post: { postId, photo } }) => {
@@ -43,16 +43,16 @@ const CommentReply = ({ username, comment, post: { postId, photo } }) => {
           as={Link}
           to={
             comment.author[0].username === username
-              ? "/profile"
-              : "/" + comment.author[0].username
+              ? '/profile'
+              : '/' + comment.author[0].username
           }
         >
-          {comment.author[0].firstName + " " + comment.author[0].lastName}
+          {comment.author[0].firstName + ' ' + comment.author[0].lastName}
         </Comment.Author>
         <Comment.Metadata>
           <div>{dayjs(comment.createdAt).fromNow()}</div>
         </Comment.Metadata>
-        <Comment.Text style={{ whiteSpace: "pre-line" }}>
+        <Comment.Text style={{ whiteSpace: 'pre-line' }}>
           <Linkify options={linkifyOptions}>{comment.text}</Linkify>
         </Comment.Text>
         <Comment.Actions>
@@ -62,11 +62,11 @@ const CommentReply = ({ username, comment, post: { postId, photo } }) => {
               commentText: comment.text,
               likes: comment.likes,
               authorId: comment.author[0]._id,
-              commentAt: comment.commentAt
+              commentAt: comment.commentAt,
             }}
             post={{
               postId,
-              photo
+              photo,
             }}
           />
         </Comment.Actions>
@@ -75,9 +75,9 @@ const CommentReply = ({ username, comment, post: { postId, photo } }) => {
   );
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   // logged in user username
-  username: state.user.data.username
+  username: state.user.data.username,
 });
 
 export default connect(mapStateToProps)(CommentReply);

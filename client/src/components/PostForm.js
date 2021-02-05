@@ -1,19 +1,18 @@
-import React, { PureComponent } from "react";
-import ReactCrop from "react-image-crop";
-import "react-image-crop/dist/ReactCrop.css";
+import React, { PureComponent } from 'react';
+import ReactCrop from 'react-image-crop';
+import 'react-image-crop/dist/ReactCrop.css';
 import {
   extractImageFileExtensionFromBase64,
-  base64StringtoFile
-} from "../reusable/ReusableUtils";
-import { Button } from "semantic-ui-react";
-import { postActions } from "../actions/postActions";
-import { connect } from "react-redux";
-import { alertActions } from "../actions/alertActions";
+  base64StringtoFile,
+} from '../reusable/ReusableUtils';
+import { Button } from 'semantic-ui-react';
+import { postActions } from '../actions/postActions';
+import { connect } from 'react-redux';
+import { alertActions } from '../actions/alertActions';
 
 const imageMaxSize = 10485760; // bytes 10MB
-const acceptedFileTypes =
-  "image/x-png, image/png, image/jpg, image/jpeg, image/gif";
-const acceptedFileTypesArray = acceptedFileTypes.split(",").map(item => {
+const acceptedFileTypes = 'image/x-png, image/png, image/jpg, image/jpeg, image/gif';
+const acceptedFileTypesArray = acceptedFileTypes.split(',').map((item) => {
   return item.trim();
 });
 
@@ -22,8 +21,8 @@ class PostForm extends PureComponent {
   fileInputRef = React.createRef();
   state = {
     crop: {
-      aspect: 1
-    }
+      aspect: 1,
+    },
   };
   //<canvas ref={this.imagePreviewCanvasRef} />
   componentDidMount = () => {
@@ -31,23 +30,23 @@ class PostForm extends PureComponent {
     dispatch(postActions.canvasHasValue(false));
   };
 
-  handleOnCropChange = crop => {
+  handleOnCropChange = (crop) => {
     this.setState({ crop: crop });
   };
 
   handleOnCropComplete = (crop, pixelCrop) => {
     const {
       post: { imgSrc },
-      dispatch
+      dispatch,
     } = this.props;
     dispatch(postActions.canvasHasValue(true));
     const canvas = this.imagePreviewCanvasRef.current; // document.createElement('canvas');
     canvas.width = pixelCrop.width;
     canvas.height = pixelCrop.height;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext('2d');
     const image = new Image();
     image.src = imgSrc;
-    image.onload = function() {
+    image.onload = function () {
       ctx.drawImage(
         image,
         pixelCrop.x,
@@ -65,26 +64,26 @@ class PostForm extends PureComponent {
     //image64toCanvasRef(canvasRef, imgSrc, pixelCrop);
   };
 
-  handleUpload = event => {
+  handleUpload = (event) => {
     event.preventDefault();
     const { imgSrc } = this.props.post;
     if (imgSrc) {
       const canvasRef = this.imagePreviewCanvasRef.current;
       const { imgSrcExt } = this.props.post;
-      const imageData64 = canvasRef.toDataURL("image/" + imgSrcExt);
-      const myFilename = "previewFile." + imgSrcExt;
+      const imageData64 = canvasRef.toDataURL('image/' + imgSrcExt);
+      const myFilename = 'previewFile.' + imgSrcExt;
       // file to be uploaded
       const myNewCroppedFile = base64StringtoFile(imageData64, myFilename);
       const fd = new FormData();
-      fd.append("photo", myNewCroppedFile, myNewCroppedFile.name);
-      fd.append("description", this.state.description);
+      fd.append('photo', myNewCroppedFile, myNewCroppedFile.name);
+      fd.append('description', this.state.description);
       const { dispatch } = this.props;
       dispatch(postActions.addPost(fd));
       //this.setState(initialState);
     }
   };
 
-  verifyFile = files => {
+  verifyFile = (files) => {
     if (files && files.length > 0) {
       const currentFile = files[0];
       const currentFileType = currentFile.type;
@@ -93,9 +92,7 @@ class PostForm extends PureComponent {
 
       if (!acceptedFileTypesArray.includes(currentFileType)) {
         dispatch(
-          alertActions.error(
-            "This file is not allowed. Only images are allowed."
-          )
+          alertActions.error('This file is not allowed. Only images are allowed.')
         );
 
         return false;
@@ -104,9 +101,7 @@ class PostForm extends PureComponent {
       if (currentFileSize > imageMaxSize) {
         dispatch(
           alertActions.error(
-            "This file is not allowed. " +
-              currentFileSize +
-              " bytes is too large"
+            'This file is not allowed. ' + currentFileSize + ' bytes is too large'
           )
         );
         return false;
@@ -115,7 +110,7 @@ class PostForm extends PureComponent {
     }
   };
 
-  handleFileSelect = event => {
+  handleFileSelect = (event) => {
     const { dispatch } = this.props;
     const files = event.target.files;
     if (files && files.length > 0) {
@@ -125,7 +120,7 @@ class PostForm extends PureComponent {
         const currentFile = files[0];
         const myFileItemReader = new FileReader();
         myFileItemReader.addEventListener(
-          "load",
+          'load',
           () => {
             // console.log(myFileItemReader.result)
             const myResult = myFileItemReader.result;
@@ -138,7 +133,7 @@ class PostForm extends PureComponent {
             );
             this.setState({
               imgSrc: myResult,
-              imgSrcExt: extractImageFileExtensionFromBase64(myResult)
+              imgSrcExt: extractImageFileExtensionFromBase64(myResult),
             });
           },
           false
@@ -149,8 +144,8 @@ class PostForm extends PureComponent {
     }
   };
 
-  changeAspect = e => {
-    if (e.target.name === "1:1") {
+  changeAspect = (e) => {
+    if (e.target.name === '1:1') {
       this.setState({ crop: { ...this.state.crop, aspect: 1 } });
     } else {
       this.setState({ crop: { ...this.state.crop, aspect: 16 / 9 } });
@@ -159,7 +154,7 @@ class PostForm extends PureComponent {
 
   resetReducer = () => {
     const { dispatch } = this.props;
-    dispatch({ type: "RESET_IMAGE" });
+    dispatch({ type: 'RESET_IMAGE' });
   };
   render() {
     const { imgSrc } = this.props.post;
@@ -170,10 +165,10 @@ class PostForm extends PureComponent {
           <div>
             <div
               style={{
-                padding: "1% 0",
-                display: "grid",
-                gridTemplateColumns: "1fr auto",
-                gridColumnGap: "1rem"
+                padding: '1% 0',
+                display: 'grid',
+                gridTemplateColumns: '1fr auto',
+                gridColumnGap: '1rem',
               }}
             >
               <div>
@@ -181,7 +176,7 @@ class PostForm extends PureComponent {
                   <i className="file icon" />
                   Change Image
                   <input
-                    style={{ display: "none" }}
+                    style={{ display: 'none' }}
                     ref={this.fileInputRef}
                     type="file"
                     accept={acceptedFileTypes}
@@ -197,11 +192,7 @@ class PostForm extends PureComponent {
                 <Button onClick={this.changeAspect} name="16:9" size="massive">
                   16:9
                 </Button>
-                <Button
-                  onClick={this.resetReducer}
-                  icon="close"
-                  size="massive"
-                />
+                <Button onClick={this.resetReducer} icon="close" size="massive" />
               </div>
             </div>
 
@@ -215,16 +206,16 @@ class PostForm extends PureComponent {
             <canvas
               id="cropped-image-canvas"
               ref={this.imagePreviewCanvasRef}
-              style={{ display: "none" }}
+              style={{ display: 'none' }}
             />
           </div>
         ) : (
-          <div style={{ padding: "1% 0" }}>
+          <div style={{ padding: '1% 0' }}>
             <label className="ui massive fluid icon button">
               <i className="file icon" />
               Select Image
               <input
-                style={{ display: "none" }}
+                style={{ display: 'none' }}
                 ref={this.fileInputRef}
                 type="file"
                 accept={acceptedFileTypes}
@@ -239,9 +230,9 @@ class PostForm extends PureComponent {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   // logged in user username
-  post: state.postUpload
+  post: state.postUpload,
 });
 
 export default connect(mapStateToProps)(PostForm);

@@ -1,21 +1,21 @@
-import React, { Component } from "react";
-import Autosuggest from "react-autosuggest";
-import { Link } from "react-router-dom";
-import { history } from "../_helpers/history";
-import { throttle } from "throttle-debounce";
-import { connect } from "react-redux";
+import React, { Component } from 'react';
+import Autosuggest from 'react-autosuggest';
+import { Link } from 'react-router-dom';
+import { history } from '../_helpers/history';
+import { throttle } from 'throttle-debounce';
+import { connect } from 'react-redux';
 
 function searchUser(q) {
   const requestOptions = {
-    method: "POST",
+    method: 'POST',
     headers: {
-      Authorization: JSON.parse(localStorage.getItem("user")).token,
-      "Content-Type": "application/json"
+      Authorization: JSON.parse(localStorage.getItem('user')).token,
+      'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ q })
+    body: JSON.stringify({ q }),
   };
 
-  return fetch("/api/user/searchByUsername", requestOptions).then(res => {
+  return fetch('/api/user/searchByUsername', requestOptions).then((res) => {
     return res;
   });
 }
@@ -26,9 +26,9 @@ function getSuggestionValue({ username }) {
 
 function renderSuggestion({ firstName, lastName, username, profilePicture }) {
   return (
-    <Link to={"/" + username}>
-      <span className={"suggestion-content " + username}>
-        <img alt="" src={"/images/profile-picture/100x100/" + profilePicture} />
+    <Link to={'/' + username}>
+      <span className={'suggestion-content ' + username}>
+        <img alt="" src={'/images/profile-picture/100x100/' + profilePicture} />
         <span className="autosuggestion-name">
           {username}
           <p>{`${firstName} ${lastName}`}</p>
@@ -38,15 +38,10 @@ function renderSuggestion({ firstName, lastName, username, profilePicture }) {
   );
 }
 
-function renderSuggestionForTags({
-  firstName,
-  lastName,
-  username,
-  profilePicture
-}) {
+function renderSuggestionForTags({ firstName, lastName, username, profilePicture }) {
   return (
-    <span className={"suggestion-content " + username}>
-      <img alt="" src={"/images/profile-picture/100x100/" + profilePicture} />
+    <span className={'suggestion-content ' + username}>
+      <img alt="" src={'/images/profile-picture/100x100/' + profilePicture} />
       <span className="autosuggestion-name">
         {username}
         <p>{`${firstName} ${lastName}`}</p>
@@ -60,53 +55,53 @@ class AutosuggestExample extends Component {
     super();
 
     this.state = {
-      value: "",
+      value: '',
       suggestions: [],
-      isLoading: false
+      isLoading: false,
     };
 
     this.debouncedLoadSuggestions = throttle(500, this.loadSuggestions);
   }
 
   loadSuggestions(value) {
-    const autosuggestInput = document.querySelector(".react-autosuggest__input")
+    const autosuggestInput = document.querySelector('.react-autosuggest__input')
       .classList;
-    autosuggestInput.add("user-suggestion-loading");
+    autosuggestInput.add('user-suggestion-loading');
     this.setState({
-      isLoading: true
+      isLoading: true,
     });
 
-    searchUser(value).then(response => {
+    searchUser(value).then((response) => {
       if (value === this.state.value) {
-        response.json().then(results => {
-          autosuggestInput.remove("user-suggestion-loading");
+        response.json().then((results) => {
+          autosuggestInput.remove('user-suggestion-loading');
           this.setState({
             isLoading: false,
-            suggestions: results.users.map(user => {
+            suggestions: results.users.map((user) => {
               return {
                 firstName: user.firstName,
                 lastName: user.lastName,
                 username: user.username,
-                profilePicture: user.profilePicture
+                profilePicture: user.profilePicture,
               };
-            })
+            }),
           });
         });
       } else {
-        autosuggestInput.remove("user-suggestion-loading");
+        autosuggestInput.remove('user-suggestion-loading');
         // Ignore suggestions if input value changed
         this.setState({
-          isLoading: false
+          isLoading: false,
         });
       }
     });
   }
 
-  onKeyDown = event => {
+  onKeyDown = (event) => {
     const { addTagPage } = this.props;
     const { value } = this.state;
 
-    if (event.keyCode === 13 && !addTagPage && value !== "") {
+    if (event.keyCode === 13 && !addTagPage && value !== '') {
       history.push(`/${value}`);
     } else if (event.keyCode === 13 && addTagPage) {
       this.props.addAutocompleteTag(value);
@@ -119,7 +114,7 @@ class AutosuggestExample extends Component {
       this.props.handleChange(newValue);
     }
     this.setState({
-      value: newValue
+      value: newValue,
     });
   };
 
@@ -129,7 +124,7 @@ class AutosuggestExample extends Component {
 
   onSuggestionsClearRequested = () => {
     this.setState({
-      suggestions: []
+      suggestions: [],
     });
   };
 
@@ -137,10 +132,10 @@ class AutosuggestExample extends Component {
     const { value, suggestions } = this.state;
     const { addTagPage, submitOnClick } = this.props;
     const inputProps = {
-      placeholder: "Search",
-      value: submitOnClick ? "" : value, // when adding image tags
+      placeholder: 'Search',
+      value: submitOnClick ? '' : value, // when adding image tags
       onChange: this.onChange,
-      onKeyDown: this.onKeyDown
+      onKeyDown: this.onKeyDown,
     };
 
     return (
@@ -150,9 +145,7 @@ class AutosuggestExample extends Component {
         onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
         onSuggestionsClearRequested={this.onSuggestionsClearRequested}
         getSuggestionValue={getSuggestionValue}
-        renderSuggestion={
-          addTagPage ? renderSuggestionForTags : renderSuggestion
-        }
+        renderSuggestion={addTagPage ? renderSuggestionForTags : renderSuggestion}
         inputProps={inputProps}
       />
     );
