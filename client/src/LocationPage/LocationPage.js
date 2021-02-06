@@ -1,41 +1,41 @@
-import React, { Component, Fragment } from "react";
-import { connect } from "react-redux";
-import { Icon, Divider } from "semantic-ui-react";
-import { Link } from "react-router-dom";
-import Messages from "../components/Messages";
-import { postActions } from "../actions/postActions";
-import InfiniteScroll from "react-infinite-scroll-component";
+import React, { Component, Fragment } from 'react';
+import { connect } from 'react-redux';
+import { Icon, Divider } from 'semantic-ui-react';
+import { Link } from 'react-router-dom';
+import Messages from '../components/Messages';
+import { postActions } from '../actions/postActions';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 class LocationPage extends Component {
   componentDidMount = () => {
     const {
       match,
       dispatch,
-      data: { coordinates }
+      data: { coordinates },
     } = this.props;
 
     if (coordinates !== match.params.coordinates) {
       dispatch(
         postActions.getPostsByLocation(match.params.coordinates, {
           initialFetch: true,
-          coordinates: match.params.coordinates
+          coordinates: match.params.coordinates,
         })
       );
     }
-    document.title = "Location Page | social-network";
+    document.title = 'Location Page | social-network';
   };
 
   fetchData = () => {
     const {
       dispatch,
       data: { postsByLocation },
-      match
+      match,
     } = this.props;
     const lastId = postsByLocation[postsByLocation.length - 1]._id;
     dispatch(
       postActions.getPostsByLocation(match.params.coordinates, {
         initialFetch: false,
-        lastId
+        lastId,
       })
     );
   };
@@ -44,14 +44,13 @@ class LocationPage extends Component {
     const {
       data: { postsByLocation, totalPostsByLocation },
       alert,
-      match
+      match,
     } = this.props;
-    const hasMore =
-      postsByLocation.length === totalPostsByLocation ? false : true;
-    const [lat, lng] = match.params.coordinates.split(",");
-    const locationPosts = postsByLocation.map(post => {
+    const hasMore = postsByLocation.length === totalPostsByLocation ? false : true;
+    const [lat, lng] = match.params.coordinates.split(',');
+    const locationPosts = postsByLocation.map((post) => {
       return (
-        <Link to={"/p/" + post._id} key={post._id}>
+        <Link to={'/p/' + post._id} key={post._id}>
           <div className="gallery-item">
             <img
               src={`/images/post-images/thumbnail/${post.photo}`}
@@ -90,13 +89,13 @@ class LocationPage extends Component {
             src={`https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/pin-l(${lat},${lng})/${lat},${lng},13,0.00,0.00/1200x250@2x?access_token=pk.eyJ1Ijoiam9obmJvcyIsImEiOiJjanl1b3l1MmkwaDdnM2pwaG5yNm1mZmlrIn0.O7X5QEcRO2ncLo_vLMVeTQ`}
           />
           <div className="location-name">
-            {postsByLocation[0] ? postsByLocation[0].location.address : ""}
+            {postsByLocation[0] ? postsByLocation[0].location.address : ''}
           </div>
         </div>
         <div className="container">
           <div>
-            <p style={{ fontSize: "2rem", paddingBottom: "1%" }}>
-              {" "}
+            <p style={{ fontSize: '2rem', paddingBottom: '1%' }}>
+              {' '}
               {totalPostsByLocation} posts
             </p>
             <Divider></Divider>
@@ -117,10 +116,10 @@ class LocationPage extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   data: state.post,
   fetchingUserData: state.user.loadingUser,
-  alert: state.alert
+  alert: state.alert,
 });
 
 const connectedLocationPage = connect(mapStateToProps)(LocationPage);

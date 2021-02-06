@@ -1,11 +1,11 @@
-import React, { Component } from "react";
-import { connect } from "react-redux";
-import Feed from "../components/Post/Feed";
-import { NewUsersList } from "../components/NewUsersLIst";
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import Feed from '../components/Post/Feed';
+import { NewUsersList } from '../components/NewUsersLIst';
 
 class HomePage extends Component {
   componentDidMount = () => {
-    document.title = "social-network";
+    document.title = 'social-network';
   };
 
   render() {
@@ -23,8 +23,8 @@ class HomePage extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  fetching: state.post
+const mapStateToProps = (state) => ({
+  fetching: state.post,
 });
 
 const connectedHomePage = connect(mapStateToProps)(HomePage);
