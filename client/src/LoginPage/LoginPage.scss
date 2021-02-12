@@ -4,7 +4,7 @@
   width: 100%;
   justify-content: space-between;
 
-  &__column {
+  .auth-column {
     width: 50%;
 
     &:nth-child(1) {
@@ -13,14 +13,14 @@
     }
   }
 
-  &__right {
+  #{$auth}-right {
     display: flex;
     flex-direction: column;
     justify-content: center;
     padding: 0 100px 0;
     background-color: #fff;
 
-    #{$auth}__header {
+    #{$auth}-header {
       display: flex;
       flex-direction: column;
 
@@ -49,7 +49,7 @@
       padding-left: 0;
       margin-bottom: 50px !important;
 
-      &__group {
+      .form-group {
         display: flex;
         flex-direction: column !important;
         margin-bottom: 50px !important;
@@ -112,7 +112,7 @@
     }
   }
 
-  &__author {
+  #{$auth}-author {
     font-size: 30px;
 
     a {
