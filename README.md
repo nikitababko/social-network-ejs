@@ -4,7 +4,7 @@
 
 ## Install
 
-1. `npm install` или `yarn install`
+1. `npm install` or `yarn install`
 2. Check the versions of the dependencies that are in the github with those that are installed. Pay special attention to socket.io-client, must be version 2.2.0
 3. Create variables.env file and replace values with yours:
 
