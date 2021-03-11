@@ -1,8 +1,8 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
 
 class NotFoundPage extends Component {
   componentDidMount = () => {
-    document.title = "Page not found | social-network";
+    document.title = 'Page not found | social-network';
   };
 
   render() {
@@ -10,9 +10,9 @@ class NotFoundPage extends Component {
       <div className="container">
         <div
           style={{
-            fontSize: "4rem",
-            fontWeight: "900",
-            color: "#262626"
+            fontSize: '4rem',
+            fontWeight: '900',
+            color: '#262626',
           }}
         >
           Page Not Found
