@@ -1,11 +1,11 @@
-const mongoose = require("mongoose");
-const ChatRoom = mongoose.model("ChatRoom");
-const Message = mongoose.model("Message");
-const User = mongoose.model("User");
-const messageHandler = require("../handlers/messageHandler");
-const path = require("path");
-const uuidv4 = require("uuid/v4");
-const multer = require("multer");
+const mongoose = require('mongoose');
+const ChatRoom = mongoose.model('ChatRoom');
+const Message = mongoose.model('Message');
+const User = mongoose.model('User');
+const messageHandler = require('../handlers/messageHandler');
+const path = require('path');
+const uuidv4 = require('uuid/v4');
+const multer = require('multer');
 
 // Check File Type
 function checkFileType(file, cb) {
@@ -19,49 +19,49 @@ function checkFileType(file, cb) {
   if (mimetype && extname) {
     return cb(null, true);
   } else {
-    cb(new Error("Only images are allowed"));
+    cb(new Error('Only images are allowed'));
   }
 }
 
 const storage = multer.diskStorage({
   //multers disk storage settings
   destination: (req, file, cb) => {
-    cb(null, "./public/images/chat-images/");
+    cb(null, './public/images/chat-images/');
   },
   filename: (req, file, cb) => {
-    const ext = file.mimetype.split("/")[1];
-    cb(null, uuidv4() + "." + ext);
-  }
+    const ext = file.mimetype.split('/')[1];
+    cb(null, uuidv4() + '.' + ext);
+  },
 });
 
 const upload = multer({
   //multer settings
   storage: storage,
-  fileFilter: function(req, file, cb) {
+  fileFilter: function (req, file, cb) {
     checkFileType(file, cb);
     messageHandler.sendImageMessageRequest(req, {
       message: {
         sender: req.userData.userId,
-        value: "Image",
+        value: 'Image',
         roomId: req.body.roomId,
-        uuid: req.body.uuid
+        uuid: req.body.uuid,
       },
-      receiver: JSON.parse(req.body.receiver)
+      receiver: JSON.parse(req.body.receiver),
     });
   },
   limits: {
-    fileSize: 10485760 //10 MB
-  }
-}).single("photo");
+    fileSize: 10485760, //10 MB
+  },
+}).single('photo');
 
 exports.upload = (req, res, next) => {
-  upload(req, res, err => {
+  upload(req, res, (err) => {
     if (err) {
       return res.status(400).json({ message: err.message });
     }
 
     if (!req.file) {
-      return res.status(400).json({ message: "Please upload a file" });
+      return res.status(400).json({ message: 'Please upload a file' });
     }
 
     req.body.photo = req.file.filename;
@@ -75,27 +75,22 @@ exports.createImageMessage = (req, res) => {
     sender: req.userData.userId,
     receiver: JSON.parse(req.body.receiver)._id,
     photo: req.body.photo,
-    messageType: "image"
+    messageType: 'image',
   })
     .save()
-    .then(result => {
-      ChatRoom.findByIdAndUpdate(
-        { _id: req.body.roomId },
-        { $inc: { messages: 1 } }
-      )
-        .then(result => console.log(result))
-        .catch(err => {
+    .then((result) => {
+      ChatRoom.findByIdAndUpdate({ _id: req.body.roomId }, { $inc: { messages: 1 } })
+        .then((result) => console.log(result))
+        .catch((err) => {
           console.log(err.message);
         });
       messageHandler.sendImageMessage(req, {
         message: { ...result.toObject(), uuid: req.body.uuid },
-        receiver: JSON.parse(req.body.receiver)
+        receiver: JSON.parse(req.body.receiver),
       });
-      res
-        .status(200)
-        .json({ message: { ...result.toObject(), uuid: req.body.uuid } });
+      res.status(200).json({ message: { ...result.toObject(), uuid: req.body.uuid } });
     })
-    .catch(err => {
+    .catch((err) => {
       console.log(err.message);
       res.status(500).json({ message: err.message });
     });
@@ -103,10 +98,10 @@ exports.createImageMessage = (req, res) => {
 
 exports.getChatRooms = (req, res) => {
   ChatRoom.getRooms(mongoose.Types.ObjectId(req.userData.userId))
-    .then(rooms => {
+    .then((rooms) => {
       res.status(200).json({ rooms });
     })
-    .catch(err => {
+    .catch((err) => {
       console.log(err.message);
       res.status(500).json({ message: err.message });
     });
@@ -121,20 +116,20 @@ exports.getMessagesForRoom = (req, res) => {
       $and: [
         {
           _id: {
-            $lt: req.body.lastId
+            $lt: req.body.lastId,
           },
-          roomId: req.body._id
-        }
-      ]
+          roomId: req.body._id,
+        },
+      ],
     };
   }
   Message.find(query)
     .limit(50)
     .sort({ createdAt: -1 })
-    .then(result => {
+    .then((result) => {
       res.status(200).json({ messages: result });
     })
-    .catch(err => {
+    .catch((err) => {
       console.log(err.message);
       res.status(500).json({ message: err.message });
     });
@@ -146,27 +141,22 @@ exports.sendMessage = (req, res) => {
     sender: req.userData.userId,
     text: req.body.value,
     receiver: req.body.receiver._id,
-    messageType: "text"
+    messageType: 'text',
   })
     .save()
-    .then(result => {
-      ChatRoom.findByIdAndUpdate(
-        { _id: req.body.roomId },
-        { $inc: { messages: 1 } }
-      )
-        .then(result => console.log(result))
-        .catch(err => {
+    .then((result) => {
+      ChatRoom.findByIdAndUpdate({ _id: req.body.roomId }, { $inc: { messages: 1 } })
+        .then((result) => console.log(result))
+        .catch((err) => {
           console.log(err.message);
         });
       messageHandler.sendMessage(req, {
         message: { ...result.toObject() },
-        receiver: req.body.receiver
+        receiver: req.body.receiver,
       });
-      res
-        .status(200)
-        .json({ message: { ...result.toObject(), uuid: req.body.uuid } });
+      res.status(200).json({ message: { ...result.toObject(), uuid: req.body.uuid } });
     })
-    .catch(err => {
+    .catch((err) => {
       console.log(err.message);
       res.status(500).json({ message: err.message });
     });
@@ -174,12 +164,12 @@ exports.sendMessage = (req, res) => {
 
 exports.readMessages = (req, res) => {
   const receiverId = req.room.members.filter(
-    member => member.toString().trim() !== req.userData.userId.toString().trim()
+    (member) => member.toString().trim() !== req.userData.userId.toString().trim()
   );
   Message.updateMany(
     {
       _id: { $in: req.body.messageIds },
-      receiver: mongoose.Types.ObjectId(req.userData.userId)
+      receiver: mongoose.Types.ObjectId(req.userData.userId),
     },
     { $set: { read: true } },
     { multi: true }
@@ -188,11 +178,11 @@ exports.readMessages = (req, res) => {
       messageHandler.sendReadMessage(req, {
         messageIds: req.body.messageIds,
         receiver: receiverId[0],
-        roomId: req.room._id
+        roomId: req.room._id,
       });
-      res.status(200).json({ read: "messages" });
+      res.status(200).json({ read: 'messages' });
     })
-    .catch(err => {
+    .catch((err) => {
       console.log(err);
       res.status(500).json({ msg: err.message });
     });
@@ -200,15 +190,15 @@ exports.readMessages = (req, res) => {
 
 exports.handleCall = (req, res) => {
   User.findById(req.userData.userId)
-    .select("profilePicture username")
-    .then(user => {
+    .select('profilePicture username')
+    .then((user) => {
       messageHandler.handleCall(req, {
         room: { ...req.body.currentRoom },
         webRtc: req.body.webRtc,
-        caller: { ...user.toObject() }
+        caller: { ...user.toObject() },
       });
     })
-    .catch(err => {
+    .catch((err) => {
       console.log(err);
       res.status(500).json({ msg: err.message });
     });
@@ -218,11 +208,11 @@ exports.handleCall = (req, res) => {
 
 exports.answer = (req, res) => {
   const userId = req.room.members.filter(
-    userId => userId.toString().trim() !== req.userData.userId.toString().trim()
+    (userId) => userId.toString().trim() !== req.userData.userId.toString().trim()
   );
   messageHandler.handleAnswer(req, {
     userId,
-    webRtc: req.body.webRtc
+    webRtc: req.body.webRtc,
   });
   res.status(200).json({});
 };
